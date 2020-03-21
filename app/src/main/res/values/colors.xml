@@ -2,9 +2,11 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorAccent">#3700B3</color>
     <color name="colorBackground">#141414</color>
     <color name="statusBarColor">#000000</color>
     <color name="navBarColor">#1F1F1F</color>
-    <color name="textColor">#FFFFFF</color>
+    <color name="textColor">#E1E1E1</color>
+    <color name="cardViewColor">#1F1F1F</color>
+    <color name="secondaryTextColor">#858585</color>
 </resources>

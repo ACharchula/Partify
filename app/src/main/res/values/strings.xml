@@ -3,5 +3,32 @@
     <string name="login_button">Log in</string>
     <string name="host_button">Host Party</string>
     <string name="join_button">Join Party</string>
+
+    <string name="track_attributes_title">Tuneable Track attributes</string>
+
+    <string name="acousticness">Acousticness</string>
+    <string name="danceability">Danceability</string>
+    <string name="duration_ms">Duration</string>
+    <string name="energy">Energy</string>
+    <string name="instrumentalness">Instrumentalness</string>
+    <string name="key">Key</string>
+    <string name="liveness">Liveness</string>
+    <string name="loudness">Loudness</string>
+    <string name="mode">Mode</string>
+    <string name="popularity">Popularity</string>
+    <string name="speechiness">Speechiness</string>
+    <string name="tempo">Tempo</string>
+    <string name="time_signature">Time signature</string>
+    <string name="valence">Valence</string>
+
+    <string name="min_checkbox">min</string>
+    <string name="target_checkbox">target</string>
+    <string name="max_checkbox">max</string>
+
     <string name="profile_image_description">Spotify profile image</string>
+    <string name="arrow_button_description">Collapse and expand button</string>
+    <string name="title_activity_user_selection">UserSelectionActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

@@ -1,5 +1,6 @@
 package pl.antonic.partify
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.squareup.picasso.Picasso
@@ -18,6 +19,11 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         loadProfile()
         setContentView(R.layout.activity_menu)
+
+        hostPartyButton.setOnClickListener {
+            val intent = Intent(this, TrackAttributesActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun loadProfile() {
