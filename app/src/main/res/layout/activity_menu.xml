@@ -34,7 +34,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/joinPartyButton"
         android:layout_width="115dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

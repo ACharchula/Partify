@@ -24,6 +24,11 @@ class MenuActivity : AppCompatActivity() {
             val intent = Intent(this, TrackAttributesActivity::class.java)
             startActivity(intent)
         }
+
+        joinPartyButton.setOnClickListener {
+            val intent = Intent(this, UserSelectionActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun loadProfile() {

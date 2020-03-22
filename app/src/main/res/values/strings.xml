@@ -5,6 +5,7 @@
     <string name="join_button">Join Party</string>
 
     <string name="track_attributes_title">Tuneable Track attributes</string>
+    <string name="seeds_selection_title">Seed selection</string>
 
     <string name="acousticness">Acousticness</string>
     <string name="danceability">Danceability</string>
@@ -28,7 +29,8 @@
     <string name="profile_image_description">Spotify profile image</string>
     <string name="arrow_button_description">Collapse and expand button</string>
     <string name="title_activity_user_selection">UserSelectionActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+
+    <string name="title_artists">Artists</string>
+    <string name="title_tracks">Tracks</string>
+    <string name="title_genres">Genres</string>
 </resources>
