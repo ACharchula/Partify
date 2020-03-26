@@ -14,11 +14,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class UserSelectionActivity : AppCompatActivity() {
+class SeedSelectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user_selection)
+        setContentView(R.layout.activity_seed_selection)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
         val navController = findNavController(R.id.nav_host_fragment)

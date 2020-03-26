@@ -6,6 +6,8 @@
 
     <string name="track_attributes_title">Tuneable Track attributes</string>
     <string name="seeds_selection_title">Seed selection</string>
+    <string name="discover_title">Searching party</string>
+    <string name="advertise_title">Creating party</string>
 
     <string name="acousticness">Acousticness</string>
     <string name="danceability">Danceability</string>

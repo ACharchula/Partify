@@ -21,12 +21,12 @@ class MenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_menu)
 
         hostPartyButton.setOnClickListener {
-            val intent = Intent(this, TrackAttributesActivity::class.java)
+            val intent = Intent(this, AdvertiseActivity::class.java)
             startActivity(intent)
         }
 
         joinPartyButton.setOnClickListener {
-            val intent = Intent(this, UserSelectionActivity::class.java)
+            val intent = Intent(this, DiscoverActivity::class.java)
             startActivity(intent)
         }
     }

@@ -5,16 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ImageView
 import android.widget.TextView
-import com.squareup.picasso.Picasso
-import pl.antonic.partify.spotify.api.model.Artist
 import pl.antonic.partify.spotify.api.model.Genres
-import pl.antonic.partify.spotify.api.model.ObjectList
 
 class GenreListAdapter(private val context: Context,
-                       private val dataSource: Genres
-) : BaseAdapter() {
+                       private val dataSource: Genres) : BaseAdapter() {
 
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -38,6 +33,4 @@ class GenreListAdapter(private val context: Context,
     override fun getCount(): Int {
         return if (dataSource.genres == null) 0 else dataSource.genres!!.size
     }
-
-
 }
