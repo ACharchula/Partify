@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/playlistCardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/cardViewColor">
+<!--    android:foreground="?android:attr/selectableItemBackground"-->
+<!--    android:clickable="true"-->
+<!--    android:focusable="true">-->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/playlistTrackPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="16dp"
+            android:adjustViewBounds="true"
+            android:maxWidth="80dp"
+            android:maxHeight="80dp" />
+
+        <TextView
+            android:id="@+id/playlistSongName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/playlistTrackPhoto"
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/playlistArtistName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playlistSongName"
+            android:layout_toEndOf="@+id/playlistTrackPhoto"
+            android:textColor="@color/secondaryTextColor"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
