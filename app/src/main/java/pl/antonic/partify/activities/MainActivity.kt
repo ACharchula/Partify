@@ -1,4 +1,4 @@
-package pl.antonic.partify
+package pl.antonic.partify.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +8,7 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.android.synthetic.main.activity_main.*
+import pl.antonic.partify.R
 import pl.antonic.partify.service.TokenService
 
 class MainActivity : AppCompatActivity() {

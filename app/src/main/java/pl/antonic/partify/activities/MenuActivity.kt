@@ -1,10 +1,13 @@
-package pl.antonic.partify
+package pl.antonic.partify.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_menu.*
+import pl.antonic.partify.activities.user.DiscoverActivity
+import pl.antonic.partify.R
+import pl.antonic.partify.activities.host.HostSeedSelectionActivity
 import pl.antonic.partify.service.TokenService
 import pl.antonic.partify.spotify.api.SpotifyApi
 import pl.antonic.partify.spotify.api.SpotifyService
@@ -15,13 +18,15 @@ import retrofit2.Response
 
 class MenuActivity : AppCompatActivity() {
 
+    //TODO Market query ?!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadProfile()
         setContentView(R.layout.activity_menu)
 
         hostPartyButton.setOnClickListener {
-            val intent = Intent(this, AdvertiseActivity::class.java)
+            val intent = Intent(this, HostSeedSelectionActivity::class.java)
             startActivity(intent)
         }
 

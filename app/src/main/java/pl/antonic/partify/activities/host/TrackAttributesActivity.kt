@@ -1,4 +1,4 @@
-package pl.antonic.partify
+package pl.antonic.partify.activities.host
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.transition.TransitionManager
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import kotlinx.android.synthetic.main.activity_track_attributes.*
+import pl.antonic.partify.R
 
 class TrackAttributesActivity : AppCompatActivity() {
 

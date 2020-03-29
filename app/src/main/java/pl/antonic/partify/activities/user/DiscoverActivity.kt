@@ -1,4 +1,4 @@
-package pl.antonic.partify
+package pl.antonic.partify.activities.user
 
 import android.Manifest
 import android.app.Activity
@@ -6,8 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.ListView
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
@@ -16,30 +14,29 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_advertise.*
+import kotlinx.android.synthetic.main.activity_discover.*
+import pl.antonic.partify.R
+import pl.antonic.partify.Seeds
 
-
-class AdvertiseActivity : AppCompatActivity() {
+class DiscoverActivity : AppCompatActivity() {
 
     private lateinit var connectionsClient: ConnectionsClient
-    private lateinit var listView: ListView
-    private lateinit var userListAdapter: UserListAdapter
 
-    private val allSeeds = mutableListOf<UserSelections>()
-    private val endpointNames = hashMapOf<String, String>()
+    private lateinit var endpointIdd: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_advertise)
-        listView = findViewById(R.id.usersListView)
+        setContentView(R.layout.activity_discover)
 
         connectionsClient = Nearby.getConnectionsClient(this)
 
-        val adapter = UserListAdapter(this, allSeeds)
-        listView.adapter = adapter
-        userListAdapter = adapter
+        startDiscovering()
 
-        startAdvertising()
+        button.setOnClickListener {
+            val seeds = Seeds()
+            val bytesPayload = Payload.fromBytes(Gson().toJson(seeds).toByteArray())
+            connectionsClient.sendPayload(endpointIdd, bytesPayload)
+        }
     }
 
     private val REQUIRED_PERMISSIONS = arrayOf<String>(
@@ -91,36 +88,17 @@ class AdvertiseActivity : AppCompatActivity() {
         recreate()
     }
 
-    private fun seedsNotNull(endpointId: String) : Boolean {
-        for (s in allSeeds) {
-            if (s.userName == endpointNames[endpointId]) {
-                return s.seeds != null
-            }
-        }
-        return false
-    }
 
-    private fun startAdvertising() {
-        val advertisingOptions = AdvertisingOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
+    private fun startDiscovering() {
+        val discoveryOptions = DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
 
         val payloadCallback = object : PayloadCallback() {
             override fun onPayloadReceived(endpointId: String, payload: Payload) {
-                if (payload.asBytes() != null) {
-                    val seeds = Gson().fromJson(String(payload.asBytes()!!), Seeds::class.java)
-
-                    for (s in allSeeds) {
-                        if (s.userName == endpointNames[endpointId]) {
-                            s.seeds = seeds
-                            break
-                        }
-                    }
-                }
+                val receivedBytes = payload.asBytes()
             }
 
             override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
-                if (update.status == PayloadTransferUpdate.Status.SUCCESS && seedsNotNull(endpointId)) {
-                    userListAdapter.notifyDataSetChanged()
-                }
+                //dwdw
             }
         }
 
@@ -128,18 +106,12 @@ class AdvertiseActivity : AppCompatActivity() {
             override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
                 when (result.status.statusCode) {
                     ConnectionsStatusCodes.STATUS_OK -> {
-                        val userName = if (endpointNames[endpointId] != null) endpointNames[endpointId]!! else endpointId
-                        allSeeds.add(UserSelections(userName))
-                        userListAdapter.notifyDataSetChanged()
-                        advertiseLoading.visibility = View.GONE
+                        Toast.makeText(this@DiscoverActivity, "ok", Toast.LENGTH_SHORT).show()
+                        endpointIdd = endpointId
                     }
-                    else -> {
-                        Toast.makeText(this@AdvertiseActivity, "rejected", Toast.LENGTH_SHORT).show()
-                        endpointNames.remove(endpointId)
-                    }
-//                    ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED -> Toast.makeText(this@AdvertiseActivity, "rejected", Toast.LENGTH_SHORT).show()
-//                    ConnectionsStatusCodes.STATUS_ERROR -> Toast.makeText(this@AdvertiseActivity, "error", Toast.LENGTH_SHORT).show()
-//                    else -> Toast.makeText(this@AdvertiseActivity, "else", Toast.LENGTH_SHORT).show()
+                    ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED -> Toast.makeText(this@DiscoverActivity, "rejected", Toast.LENGTH_SHORT).show()
+                    ConnectionsStatusCodes.STATUS_ERROR -> Toast.makeText(this@DiscoverActivity, "error", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(this@DiscoverActivity, "else", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -148,12 +120,12 @@ class AdvertiseActivity : AppCompatActivity() {
             }
 
             override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
-                endpointNames[endpointId] = connectionInfo.endpointName
-
-                AlertDialog.Builder(this@AdvertiseActivity, R.style.AlertDialogCustom)
+                AlertDialog.Builder(this@DiscoverActivity,
+                    R.style.AlertDialogCustom
+                )
                     .setTitle("Accept connection to " + connectionInfo.endpointName)
                     .setMessage("Confirm the code matches on both deices: " + connectionInfo.authenticationToken)
-                    .setPositiveButton("Accept") { _, _ ->
+                    .setPositiveButton("Accept") {_ , _ ->
                         connectionsClient.acceptConnection(endpointId, payloadCallback)
                     }.setNegativeButton(android.R.string.cancel) {_, _ ->
                         connectionsClient.rejectConnection(endpointId)
@@ -161,8 +133,29 @@ class AdvertiseActivity : AppCompatActivity() {
             }
         }
 
-        connectionsClient
-            .startAdvertising("nickName2", "pl.antonic.partify", mConnectionLifecycleCallback, advertisingOptions)
-            .addOnSuccessListener {  }.addOnFailureListener {  }
+        val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
+            override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
+                connectionsClient
+                    .requestConnection("nickname1", endpointId, mConnectionLifecycleCallback)
+                    .addOnSuccessListener {
+
+                    }.addOnFailureListener {
+
+                    }
+            }
+
+            override fun onEndpointLost(endpointId: String) {
+                //
+            }
+
+        }
+
+        Nearby.getConnectionsClient(this)
+            .startDiscovery("pl.antonic.partify", endpointDiscoveryCallback, discoveryOptions)
+//            .addOnSuccessListener {
+//
+//            }.addOnFailureListener {
+//
+//            }
     }
 }

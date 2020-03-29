@@ -1,4 +1,4 @@
-package pl.antonic.partify
+package pl.antonic.partify.list.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,6 +8,8 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import pl.antonic.partify.R
+import pl.antonic.partify.UserSelections
 
 class UserListAdapter(private val context: Context,
                       private val dataSource: List<UserSelections>) : BaseAdapter() {

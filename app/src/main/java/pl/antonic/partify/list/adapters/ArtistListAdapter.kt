@@ -1,13 +1,18 @@
-package pl.antonic.partify
+package pl.antonic.partify.list.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.squareup.picasso.Picasso
+import pl.antonic.partify.R
+import pl.antonic.partify.SeedType
+import pl.antonic.partify.activities.SeedListModificator
 import pl.antonic.partify.spotify.api.model.Artist
 import pl.antonic.partify.spotify.api.model.ObjectList
 
@@ -21,9 +26,33 @@ class ArtistListAdapter(private val context: Context,
 
         val artistPhoto = rowView.findViewById(R.id.artistPhoto) as ImageView
         val artistName = rowView.findViewById(R.id.artistName) as TextView
+        val artistCardView = rowView.findViewById<CardView>(R.id.artistCardView)
+        val artistCheckBox = rowView.findViewById<CheckBox>(R.id.artistCheckBox)
 
         val artist = getItem(position) as Artist
 
+        val listModificator = context as SeedListModificator
+
+        artistCheckBox.setOnClickListener {
+            if (!artistCheckBox.isChecked) {
+                listModificator.removeId(artist.id!!, SeedType.ARTIST)
+            } else {
+                if (!listModificator.addId(artist.id!!, SeedType.ARTIST))
+                    artistCheckBox.isChecked = false
+            }
+        }
+
+        artistCardView.setOnClickListener {
+            if (artistCheckBox.isChecked) {
+                listModificator.removeId(artist.id!!, SeedType.ARTIST)
+                artistCheckBox.isChecked = false
+            } else {
+                if (listModificator.addId(artist.id!!, SeedType.ARTIST))
+                    artistCheckBox.isChecked = true
+            }
+        }
+
+        artistCheckBox.isChecked = listModificator.containsId(artist.id!!, SeedType.ARTIST)
         Picasso.get().load(artist.images!![0].url).into(artistPhoto)
         artistName.text = artist.name
 
