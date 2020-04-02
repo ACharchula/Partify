@@ -7,6 +7,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_menu.*
 import pl.antonic.partify.activities.user.DiscoverActivity
 import pl.antonic.partify.R
+import pl.antonic.partify.activities.host.AdvertiseActivity
 import pl.antonic.partify.activities.host.HostSeedSelectionActivity
 import pl.antonic.partify.service.TokenService
 import pl.antonic.partify.spotify.api.SpotifyApi
@@ -26,7 +27,7 @@ class MenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_menu)
 
         hostPartyButton.setOnClickListener {
-            val intent = Intent(this, HostSeedSelectionActivity::class.java)
+            val intent = Intent(this, AdvertiseActivity::class.java)
             startActivity(intent)
         }
 

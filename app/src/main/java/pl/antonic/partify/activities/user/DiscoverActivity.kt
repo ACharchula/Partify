@@ -2,6 +2,7 @@ package pl.antonic.partify.activities.user
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -15,28 +16,19 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_discover.*
+import pl.antonic.partify.NearbyClient
 import pl.antonic.partify.R
 import pl.antonic.partify.Seeds
 
 class DiscoverActivity : AppCompatActivity() {
 
-    private lateinit var connectionsClient: ConnectionsClient
-
-    private lateinit var endpointIdd: String
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_discover)
 
-        connectionsClient = Nearby.getConnectionsClient(this)
+        NearbyClient.set(Nearby.getConnectionsClient(this))
 
         startDiscovering()
-
-        button.setOnClickListener {
-            val seeds = Seeds()
-            val bytesPayload = Payload.fromBytes(Gson().toJson(seeds).toByteArray())
-            connectionsClient.sendPayload(endpointIdd, bytesPayload)
-        }
     }
 
     private val REQUIRED_PERMISSIONS = arrayOf<String>(
@@ -106,8 +98,11 @@ class DiscoverActivity : AppCompatActivity() {
             override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
                 when (result.status.statusCode) {
                     ConnectionsStatusCodes.STATUS_OK -> {
+                        NearbyClient.get().stopDiscovery()
                         Toast.makeText(this@DiscoverActivity, "ok", Toast.LENGTH_SHORT).show()
-                        endpointIdd = endpointId
+                        val intent = Intent(this@DiscoverActivity, UserSeedSelectionActivity::class.java)
+                        intent.putExtra("endpointId", endpointId)
+                        startActivity(intent)
                     }
                     ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED -> Toast.makeText(this@DiscoverActivity, "rejected", Toast.LENGTH_SHORT).show()
                     ConnectionsStatusCodes.STATUS_ERROR -> Toast.makeText(this@DiscoverActivity, "error", Toast.LENGTH_SHORT).show()
@@ -126,16 +121,16 @@ class DiscoverActivity : AppCompatActivity() {
                     .setTitle("Accept connection to " + connectionInfo.endpointName)
                     .setMessage("Confirm the code matches on both deices: " + connectionInfo.authenticationToken)
                     .setPositiveButton("Accept") {_ , _ ->
-                        connectionsClient.acceptConnection(endpointId, payloadCallback)
+                        NearbyClient.get().acceptConnection(endpointId, payloadCallback)
                     }.setNegativeButton(android.R.string.cancel) {_, _ ->
-                        connectionsClient.rejectConnection(endpointId)
+                        NearbyClient.get().rejectConnection(endpointId)
                     }.setIcon(android.R.drawable.ic_dialog_alert).show()
             }
         }
 
         val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
             override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-                connectionsClient
+                NearbyClient.get()
                     .requestConnection("nickname1", endpointId, mConnectionLifecycleCallback)
                     .addOnSuccessListener {
 
@@ -150,7 +145,7 @@ class DiscoverActivity : AppCompatActivity() {
 
         }
 
-        Nearby.getConnectionsClient(this)
+        NearbyClient.get()
             .startDiscovery("pl.antonic.partify", endpointDiscoveryCallback, discoveryOptions)
 //            .addOnSuccessListener {
 //

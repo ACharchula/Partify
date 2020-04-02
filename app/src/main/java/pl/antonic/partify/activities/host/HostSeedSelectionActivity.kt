@@ -9,8 +9,7 @@ class HostSeedSelectionActivity : UserSeedSelectionActivity() {
     private lateinit var allSeeds : Seeds
 
     override fun getExtraData() {
-        allSeeds = Seeds()
-        //intent.getSerializableExtra(ALL_SEEDS_EXTRA_NAME) as Seeds
+        allSeeds = intent.getSerializableExtra("all_seeds") as Seeds
     }
 
     override fun nextButtonOnClick() {

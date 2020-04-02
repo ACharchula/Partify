@@ -2,6 +2,7 @@ package pl.antonic.partify.activities.host
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -45,6 +46,21 @@ class AdvertiseActivity : AppCompatActivity() {
         userListAdapter = adapter
 
         startAdvertising()
+
+        advertiseNextButton.setOnClickListener {
+            connectionsClient.stopAdvertising() //stop all endpoints?
+            var seeds = Seeds()
+
+            for (user in allSeeds) {
+                if (user.seeds != null)
+                    seeds = seeds.combineSeeds(user.seeds!!)
+            }
+
+            val intent = Intent(this, HostSeedSelectionActivity::class.java)
+            intent.putExtra("all_seeds", seeds)
+            startActivity(intent)
+
+        }
     }
 
     private val REQUIRED_PERMISSIONS = arrayOf<String>(

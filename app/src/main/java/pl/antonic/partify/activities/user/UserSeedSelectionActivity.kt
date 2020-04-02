@@ -2,6 +2,9 @@ package pl.antonic.partify.activities.user
 
 import android.content.Intent
 import android.widget.ListView
+import com.google.android.gms.nearby.connection.Payload
+import com.google.gson.Gson
+import pl.antonic.partify.NearbyClient
 import pl.antonic.partify.list.adapters.ArtistListAdapter
 import pl.antonic.partify.list.adapters.GenreListAdapter
 import pl.antonic.partify.list.adapters.TrackListAdapter
@@ -82,6 +85,9 @@ open class UserSeedSelectionActivity : SeedSelectionActivity() {
     }
 
     override fun nextButtonOnClick() {
+        val bytesPayload = Payload.fromBytes(Gson().toJson(getSeeds()).toByteArray())
+        NearbyClient.get().sendPayload(intent.getStringExtra("endpointId")!!, bytesPayload)
+
         val intent = Intent(this, UserFinalActivity::class.java)
         startActivity(intent)
     }
