@@ -16,13 +16,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.host.PlaylistActivity"></activity>
-        <activity android:name=".activities.user.UserFinalActivity" />
-        <activity android:name=".activities.host.AdvertiseActivity" />
-        <activity android:name=".activities.user.DiscoverActivity" />
-        <activity android:name=".activities.host.TrackAttributesActivity" />
-        <activity android:name=".activities.MenuActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".ui.host.playlist.PlaylistActivity"></activity>
+        <activity android:name=".ui.user.last.UserLastActivity" />
+        <activity android:name=".ui.host.advertise.AdvertiseActivity" />
+        <activity android:name=".ui.user.discover.DiscoverActivity" />
+        <activity android:name=".ui.host.attributes.TrackAttributesActivity" />
+        <activity android:name="pl.antonic.partify.ui.common.menu.MenuActivity" />
+        <activity android:name="pl.antonic.partify.ui.common.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,9 +32,9 @@
         <activity
             android:name="com.spotify.sdk.android.auth.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".activities.host.HostSeedSelectionActivity" />
-        <activity android:name=".activities.user.UserSeedSelectionActivity" />
-        <activity android:name=".activities.host.AllSeedSelectionActivity" />
+        <activity android:name=".ui.host.selection.user.HostSeedSelectionActivity" />
+        <activity android:name=".ui.user.selection.UserSeedSelectionActivity" />
+        <activity android:name=".ui.host.selection.all.AllSeedSelectionActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

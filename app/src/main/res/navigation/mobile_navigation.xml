@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="pl.antonic.partify.ui.home.ArtistsFragment"
+        android:name="pl.antonic.partify.ui.common.selection.artists.ArtistsFragment"
         android:label="@string/title_artists"
         tools:layout="@layout/fragment_artists" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="pl.antonic.partify.ui.dashboard.TracksFragment"
+        android:name="pl.antonic.partify.ui.common.selection.tracks.TracksFragment"
         android:label="@string/title_tracks"
         tools:layout="@layout/fragment_tracks" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="pl.antonic.partify.ui.notifications.GenresFragment"
+        android:name="pl.antonic.partify.ui.common.selection.genres.GenresFragment"
         android:label="@string/title_genres"
         tools:layout="@layout/fragment_genres" />
 </navigation>
