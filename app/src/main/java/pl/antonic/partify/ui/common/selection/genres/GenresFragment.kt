@@ -6,25 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_genres.*
 import pl.antonic.partify.R
 import pl.antonic.partify.ui.common.selection.SeedListViewSetter
+import pl.antonic.partify.ui.common.selection.SeedSelectionViewModel
 
 class GenresFragment : Fragment() {
 
-    private lateinit var genresViewModel: GenresViewModel
-    private lateinit var listView: ListView
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        genresViewModel = ViewModelProvider(this).get(GenresViewModel::class.java)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_genres, container, false)
+        (activity as SeedListViewSetter).setGenreData()
 
-        listView = root.findViewById(R.id.genresListView)
-        (activity as SeedListViewSetter).setGenreData(listView)
+        val viewModel: SeedSelectionViewModel by activityViewModels()
+        viewModel.genres.observe(viewLifecycleOwner, Observer {
+            genresRecycleView.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = GenreRecycleViewAdapter(it)
+            }
+        })
 
         return root
     }

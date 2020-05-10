@@ -3,12 +3,15 @@
     <string name="login_button">Log in</string>
     <string name="host_button">Host Party</string>
     <string name="join_button">Join Party</string>
+    <string name="logout_button">Logout</string>
 
     <string name="track_attributes_title">Tuneable Track attributes</string>
     <string name="seeds_selection_title">Seed selection</string>
     <string name="discover_title">Searching party</string>
     <string name="advertise_title">Creating party</string>
     <string name="playlist_title">Final playlist</string>
+    <string name="final_user_title">Everything\'s done!</string>
+    <string name="final_user_description">Your choices have been sent to host</string>
 
     <string name="acousticness">Acousticness</string>
     <string name="danceability">Danceability</string>

@@ -3,18 +3,16 @@ package pl.antonic.partify.ui.common.menu
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
+import com.spotify.sdk.android.auth.AuthorizationClient
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_menu.*
 import pl.antonic.partify.ui.user.discover.DiscoverActivity
 import pl.antonic.partify.R
 import pl.antonic.partify.ui.host.advertise.AdvertiseActivity
 import pl.antonic.partify.service.common.TokenService
-import pl.antonic.partify.service.spotify.SpotifyApi
-import pl.antonic.partify.service.spotify.SpotifyService
-import pl.antonic.partify.model.spotify.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import pl.antonic.partify.ui.common.main.MainActivity
 
 class MenuActivity : AppCompatActivity() {
 
@@ -34,22 +32,25 @@ class MenuActivity : AppCompatActivity() {
             val intent = Intent(this, DiscoverActivity::class.java)
             startActivity(intent)
         }
+
+        logoutButton.setOnClickListener {
+            AuthorizationClient.clearCookies(this)
+            TokenService.delete(this)
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun loadProfile() {
-        val retrofit = SpotifyService.getService()
-        val apiService = retrofit.create(SpotifyApi::class.java)
-        val call = apiService.getMe("Bearer " + TokenService.retrieve(this))
-        call.enqueue(object : Callback<User> {
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                val a = 1
+        val model : MenuViewModel by viewModels()
+        model.user.observe(this, Observer {
+            if (it.images != null)
+                Picasso.get().load(it.images!![0].url).into(profilePictureImageView)
+            if (it.display_name != null) {
+                displayNameTextView.text = it.display_name
+            } else {
+                displayNameTextView.text = "Couldn't load name data"
             }
-
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                Picasso.get().load(response.body()!!.images!![0].url).into(profilePictureImageView)
-                displayNameTextView.text = response.body()!!.display_name
-            }
-
         })
     }
 }

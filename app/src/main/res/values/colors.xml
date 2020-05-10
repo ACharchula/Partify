@@ -9,4 +9,5 @@
     <color name="textColor">#E1E1E1</color>
     <color name="cardViewColor">#1F1F1F</color>
     <color name="secondaryTextColor">#858585</color>
+    <color name="cardViewSecondaryColor">#505050</color>
 </resources>

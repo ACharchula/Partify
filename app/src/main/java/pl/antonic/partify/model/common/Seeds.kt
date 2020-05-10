@@ -10,7 +10,7 @@ class Seeds : Serializable {
     private var tracksIds = mutableListOf<String>()
     private var genresIds = mutableListOf<String>()
 
-    public fun add(id: String, type: SeedType) : Boolean {
+    fun add(id: String, type: SeedType) : Boolean {
         if (exceedsMaxAmount())
             return false
 
@@ -23,7 +23,7 @@ class Seeds : Serializable {
         return true
     }
 
-    public fun remove(id: String, type: SeedType) {
+    fun remove(id: String, type: SeedType) {
         when(type) {
             SeedType.ARTIST -> artistsIds.remove(id)
             SeedType.TRACK -> tracksIds.remove(id)

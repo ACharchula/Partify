@@ -1,9 +1,16 @@
 package pl.antonic.partify.ui.common.main
 
+import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.CallSuper
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -14,9 +21,58 @@ import pl.antonic.partify.ui.common.menu.MenuActivity
 
 class MainActivity : AppCompatActivity() {
 
-    val REQUEST_CODE = 1337
-    val CLIENT_ID = "871a79f969aa43f4923bfa59a852d6fe"
-    val REDIRECT_URI = "partify://callback"
+    private val REQUEST_CODE = 1337
+    private val CLIENT_ID = "871a79f969aa43f4923bfa59a852d6fe"
+    private val REDIRECT_URI = "partify://callback"
+
+    private val REQUIRED_PERMISSIONS = arrayOf<String>(
+        Manifest.permission.BLUETOOTH,
+        Manifest.permission.BLUETOOTH_ADMIN,
+        Manifest.permission.ACCESS_WIFI_STATE,
+        Manifest.permission.CHANGE_WIFI_STATE,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onStart() {
+        super.onStart()
+        if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {
+            requestPermissions(REQUIRED_PERMISSIONS, 1)
+        }
+    }
+
+    private fun hasPermissions(
+        context: Activity,
+        permissions: Array<String>
+    ): Boolean {
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false
+            }
+        }
+        return true
+    }
+
+    /** Handles user acceptance (or denial) of our permission request.  */
+    @CallSuper
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String?>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != 1) {
+            return
+        }
+        for (grantResult in grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "missing permission", Toast.LENGTH_LONG).show()
+                finish()
+                return
+            }
+        }
+        recreate()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                     TokenService.store(this, response.accessToken)
                     goToMenu()
                 }
-                AuthorizationResponse.Type.ERROR -> Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show()
+                AuthorizationResponse.Type.ERROR -> Toast.makeText(this, "Authorization error", Toast.LENGTH_SHORT).show()
                 else -> Toast.makeText(this, "Unknown error occurred!", Toast.LENGTH_SHORT).show()
             }
         }
@@ -63,11 +119,5 @@ class MainActivity : AppCompatActivity() {
     private fun goToMenu() {
         val intent = Intent(this, MenuActivity::class.java)
         startActivity(intent)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        AuthorizationClient.clearCookies(this)
-        TokenService.delete(this)
     }
 }

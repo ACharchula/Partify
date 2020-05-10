@@ -4,10 +4,10 @@
     android:id="@+id/playlistCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/cardViewColor">
-<!--    android:foreground="?android:attr/selectableItemBackground"-->
-<!--    android:clickable="true"-->
-<!--    android:focusable="true">-->
+    app:cardBackgroundColor="@color/cardViewColor"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <RelativeLayout
         android:layout_width="match_parent"

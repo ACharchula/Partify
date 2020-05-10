@@ -6,5 +6,4 @@ interface SeedListModificator {
 
     fun addId(id: String, type: SeedType) : Boolean
     fun removeId(id: String, type: SeedType)
-    fun containsId(id: String, type: SeedType) : Boolean
 }
