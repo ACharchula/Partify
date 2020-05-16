@@ -2,66 +2,31 @@ package pl.antonic.partify.ui.host.playlist
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.ListView
+import android.widget.SeekBar
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector.ConnectionListener
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import kotlinx.android.synthetic.main.activity_playlist.*
 import pl.antonic.partify.R
-import pl.antonic.partify.model.common.SeedType
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.spotify.*
-import pl.antonic.partify.service.common.TokenService
-import pl.antonic.partify.service.spotify.SpotifyApi
-import pl.antonic.partify.service.spotify.SpotifyService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import java.util.*
+import java.util.concurrent.TimeUnit
 
-class PlaylistActivity : AppCompatActivity() {
+class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
 
-    lateinit var finalSeeds : Seeds
-    private lateinit var listView: ListView
-    lateinit var playlist : Playlist
-    var connected = false
+    private lateinit var finalSeeds : Seeds
 
     val CLIENT_ID = "871a79f969aa43f4923bfa59a852d6fe"
     val REDIRECT_URI = "partify://callback"
+
+    private lateinit var viewModel: PlaylistViewModel
     private var mSpotifyAppRemote: SpotifyAppRemote? = null
-    lateinit var playlistTrackListAdapter : PlaylistTracksListAdapter
-
-    private fun connectToSpotify() {
-        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
-            .setRedirectUri(REDIRECT_URI)
-            .showAuthView(true)
-            .build()
-
-        SpotifyAppRemote.connect(this, connectionParams,
-            object : ConnectionListener {
-                override fun onFailure(p0: Throwable?) {
-                    connected = false
-                }
-
-                override fun onConnected(spotifyAppRemote: SpotifyAppRemote?) {
-                    buttonLayout.visibility = View.VISIBLE
-                    connected = true
-                    mSpotifyAppRemote = spotifyAppRemote!!
-                    //TODO CHECK WHICH NUMBER mSpotifyAppRemote.playerApi.setRepeat()
-                    mSpotifyAppRemote!!.playerApi.play(playlist.uri)
-                    playlistTrackListAdapter.playAtIndex(0)
-                    //TODO
-                    mSpotifyAppRemote!!.playerApi
-                        .subscribeToPlayerState()
-                        .setEventCallback { s ->
-                            Log.d("dupa", s.track.name)
-                         }
-                }
-
-            })
-    }
 
     private fun play() {
         mSpotifyAppRemote!!.playerApi.resume()
@@ -72,11 +37,13 @@ class PlaylistActivity : AppCompatActivity() {
     }
 
     private fun next() {
-        mSpotifyAppRemote!!.playerApi.skipNext()
+        mSpotifyAppRemote!!.playerApi!!.skipNext()
+        //viewModel.nextTrack()
     }
 
     private fun previous() {
-        mSpotifyAppRemote!!.playerApi.skipPrevious()
+        mSpotifyAppRemote!!.playerApi!!.skipPrevious()
+        //viewModel.previousTrack()
     }
 
     override fun onStop() {
@@ -89,114 +56,151 @@ class PlaylistActivity : AppCompatActivity() {
         setContentView(R.layout.activity_playlist)
 
         finalSeeds = intent.getSerializableExtra("final_seeds") as Seeds
+        viewModel = ViewModelProvider(this).get(PlaylistViewModel::class.java)
 
-        listView = findViewById(R.id.playlistListView)
+        val tracksRecycleViewAdapter : PlaylistTracksRecycleViewAdapter = if (viewModel.tracks.value != null)
+            PlaylistTracksRecycleViewAdapter(viewModel.tracks.value!!)
+        else
+            PlaylistTracksRecycleViewAdapter(ObjectList(null))
 
-        playButton.setOnClickListener {
+        viewModel.tracks.observe(this, Observer {
+            tracksRecycleViewAdapter.apply {
+                dataSource = it
+                notifyDataSetChanged()
+            }
+        })
 
+        viewModel.currentlyPlaying.observe(this, Observer {
+            tracksRecycleViewAdapter.apply {
+                currentlyPlaying = it
+                notifyDataSetChanged()
+            }
+        })
+
+        viewModel.playerState.observe(this, Observer {
+            val playerState = it
+
+            val allArtists = mutableListOf<String>()
+            for (artist in playerState.track.artists) {
+                allArtists.add(artist.name!!)
+            }
+            playlistArtist.text = allArtists.joinToString()
+            playlistTrack.text = playerState.track.name //TODO add album
+
+            if (playerState.isPaused) {
+                playButton.setImageResource(R.drawable.ic_play_arrow_white_48dp)
+            } else {
+                playButton.setImageResource(R.drawable.ic_pause_white_48dp)
+            }
+
+            playlistSeekBar.max = playerState.track.duration.toInt()
+            playlistSeekBar.progress = playerState.playbackPosition.toInt()
+
+            duration.text = transformToMinutesAndSeconds(playerState.track.duration)
+            playbackPosition.text = transformToMinutesAndSeconds(playerState.playbackPosition)
+
+            if (!viewModel.getCurrentTrack().name.equals(playerState.track.name)) {
+                viewModel.setIndexBasedOnName(playerState.track.name)
+            }
+        })
+
+        playlistListView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = tracksRecycleViewAdapter
         }
+
+        viewModel.playlist.observe(this, Observer {
+            if (!viewModel.isPlaylistStarted) {
+                viewModel.selectAtIndex(0)
+                mSpotifyAppRemote!!.playerApi.play(viewModel.playlist.value!!.uri)
+                buttonLayout.visibility = View.VISIBLE
+                viewModel.isPlaylistStarted = true
+            }
+        })
+
+        viewModel.getTracks(finalSeeds)
+        connectToSpotifyAppRemote()
 
         nextButton.setOnClickListener {
             next()
-            playlistTrackListAdapter.nextTrack()
         }
 
         previousButton.setOnClickListener {
             previous()
-            playlistTrackListAdapter.previousTrack()
         }
 
-        val retrofit = SpotifyService.getService()
-        val apiService = retrofit.create(SpotifyApi::class.java)
+        playButton.setOnClickListener {
+            val isPaused = viewModel.playerState.value?.isPaused ?: false
+            if (isPaused) {
+                play()
+            } else {
+                pause()
+            }
+        }
 
-        val seedArtists: String? = nullOrJoinedElements(finalSeeds.getList(SeedType.ARTIST))
-        val seedTracks: String? = nullOrJoinedElements(finalSeeds.getList(SeedType.TRACK))
-        val seedGenres: String? = nullOrJoinedElements(finalSeeds.getList(SeedType.GENRE))
-
-        //TODO change market to get from user
-        val call = apiService.getRecommendations("Bearer " + TokenService.retrieve(this)
-            , "PL", seedArtists, seedGenres, seedTracks)
-
-        call.enqueue(object : Callback<Recommendations> {
-            override fun onFailure(call: Call<Recommendations>, t: Throwable) {
-                val a = 1
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                val isPaused = viewModel.playerState.value?.isPaused ?: true
+                if (!isPaused) {
+                    playlistSeekBar.progress += 10
+                }
             }
 
-            override fun onResponse(call: Call<Recommendations>, response: Response<Recommendations>) {
-                val recommendations = response.body()!!
+        } , 0, 10)
 
-                //TODO check if tracks can be null
-                createPlaylistAndAddTracks(recommendations.tracks!!)
-                val adapter =
-                    PlaylistTracksListAdapter(
-                        this@PlaylistActivity,
-                        ObjectList(
-                            recommendations.tracks!!
-                        )
-                    )
-                listView.adapter = adapter
-                playlistTrackListAdapter = adapter
+        playlistSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                playbackPosition.text = transformToMinutesAndSeconds(p1.toLong())
             }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+                mSpotifyAppRemote!!.playerApi.seekTo(p0!!.progress.toLong())
+            }
+
         })
     }
 
-    private fun createPlaylistAndAddTracks(tracks: List<Track>) {
-
-        val tracksURIs = mutableListOf<String>()
-
-        for (track in tracks) {
-            tracksURIs.add(track.uri!!)
-        }
-
-        val tracksString = tracksURIs.joinToString(",")
-
-        val retrofit = SpotifyService.getService()
-        val apiService = retrofit.create(SpotifyApi::class.java)
-
-        val call = apiService.getMe("Bearer " + TokenService.retrieve(this))
-        call.enqueue(object : Callback<User> {
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Toast.makeText(this@PlaylistActivity, "NOT DONE", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                val user = response.body()!!
-                val secondCall = apiService.createPlaylist("Bearer " + TokenService.retrieve(this@PlaylistActivity),
-                    user.id!!,
-                    CreatePlaylistData("Partify-" + user.display_name + " " + System.currentTimeMillis())
-                )
-
-                secondCall.enqueue(object : Callback<Playlist> {
-                    override fun onFailure(call: Call<Playlist>, t: Throwable) {
-                        Toast.makeText(this@PlaylistActivity, "NOT DONE", Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onResponse(call: Call<Playlist>, response: Response<Playlist>) {
-                        playlist = response.body()!!
-                        val thirdCallback = apiService.addTracksToPlaylist("Bearer " + TokenService.retrieve(this@PlaylistActivity)
-                            , playlist.id!!, tracksString)
-                        thirdCallback.enqueue(object : Callback<Void> {
-                            override fun onFailure(call: Call<Void>, t: Throwable) {
-                                Toast.makeText(this@PlaylistActivity, "NOT DONE", Toast.LENGTH_SHORT).show()
-                            }
-
-                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                Toast.makeText(this@PlaylistActivity, "DONE", Toast.LENGTH_SHORT).show()
-                                connectToSpotify()
-                            }
-
-                        })
-                    }
-
-                })
-            }
-
-        })
-
+    override fun playSelectedTrack(position: Int) {
+        viewModel.selectAtIndex(position)
+        mSpotifyAppRemote!!.playerApi.skipToIndex(viewModel.playlist.value!!.uri, position)
     }
 
-    private fun nullOrJoinedElements(list: List<String>) : String? {
-        return if (list.isEmpty()) null else list.joinToString(",")
+    private fun connectToSpotifyAppRemote() {
+        SpotifyAppRemote.disconnect(mSpotifyAppRemote)
+        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
+            .setRedirectUri(REDIRECT_URI)
+            .showAuthView(true)
+            .build()
+
+        SpotifyAppRemote.connect(this, connectionParams,
+            object : ConnectionListener {
+                override fun onFailure(p0: Throwable?) {
+                    Toast.makeText(this@PlaylistActivity, "Couldn't connect to Spotify app remote!", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onConnected(spotifyAppRemote: SpotifyAppRemote?) {
+                    mSpotifyAppRemote = spotifyAppRemote
+                    //TODO CHECK WHICH NUMBER mSpotifyAppRemote.playerApi.setRepeat() if it is in loop
+                    subscribeToPlayerState()
+                }
+            })
     }
 
+    private fun subscribeToPlayerState() {
+        mSpotifyAppRemote!!.playerApi
+            .subscribeToPlayerState()
+            .setEventCallback { playerState ->
+                viewModel.setPlayerState(playerState)
+            }
+    }
+
+    private fun transformToMinutesAndSeconds(millis: Long) : String {
+        return String.format("%02d:%02d",
+        TimeUnit.MILLISECONDS.toMinutes(millis),
+        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)))
+    }
 }

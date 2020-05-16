@@ -6,6 +6,7 @@ class Track {
     var id: String? = null
     var name: String? = null
     var uri: String? = null
+    var duration_ms: Long? = null
 
     var selected = false
 }

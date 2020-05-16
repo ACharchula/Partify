@@ -2,6 +2,8 @@ package pl.antonic.partify.service.spotify
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import pl.antonic.partify.model.common.SeedType
+import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.common.SelectableGenres
 import pl.antonic.partify.model.spotify.*
 import retrofit2.Call
@@ -14,7 +16,7 @@ class SpotifyService {
     companion object {
         private const val SPOTIFY_WEB_API_ENDPOINT = "https://api.spotify.com/v1/"
 
-        public fun getService() : Retrofit {
+        fun getService() : Retrofit {
             return Retrofit.Builder()
                 .baseUrl(SPOTIFY_WEB_API_ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -136,6 +138,96 @@ class SpotifyService {
                 }
             })
         }
+    }
+
+    fun getRecommendationsInNewPlaylist(
+        _tracks: MutableLiveData<ObjectList<Track>>,
+        _playlist: MutableLiveData<Playlist>,
+        seeds: Seeds,
+        accessToken: String
+    ) {
+        val apiService = getApiService()
+
+        val seedArtists: String? = nullOrJoinedElements(seeds.getList(SeedType.ARTIST))
+        val seedTracks: String? = nullOrJoinedElements(seeds.getList(SeedType.TRACK))
+        val seedGenres: String? = nullOrJoinedElements(seeds.getList(SeedType.GENRE))
+
+        //TODO change market to get from user
+        val call = apiService.getRecommendations(
+            "Bearer $accessToken"
+            , "PL", seedArtists, seedGenres, seedTracks)
+
+        call.enqueue(object : Callback<Recommendations> {
+            override fun onFailure(call: Call<Recommendations>, t: Throwable) {
+                Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+            }
+
+            override fun onResponse(call: Call<Recommendations>, response: Response<Recommendations>) {
+                val recommendations = response.body()!!
+
+                //TODO check if tracks can be null
+                val tracks = recommendations.tracks!!
+                _tracks.value = ObjectList(tracks)
+                createPlaylistAndAddTracks(tracks, _playlist, accessToken)
+            }
+        })
+    }
+
+    private fun createPlaylistAndAddTracks(tracks: List<Track>,
+                                           _playlist: MutableLiveData<Playlist>,
+                                           accessToken: String) {
+
+        val tracksURIs = mutableListOf<String>()
+
+        for (track in tracks) {
+            tracksURIs.add(track.uri!!)
+        }
+
+        val tracksString = tracksURIs.joinToString(",")
+
+        val apiService = getApiService()
+
+        val call = apiService.getMe("Bearer $accessToken")
+        call.enqueue(object : Callback<User> { //TODO get user id from object created at the start of the app
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+            }
+
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                val user = response.body()!!
+                val secondCall = apiService.createPlaylist(
+                    "Bearer $accessToken",
+                    user.id!!,
+                    CreatePlaylistData("Partify-" + System.currentTimeMillis())
+                )
+
+                secondCall.enqueue(object : Callback<Playlist> {
+                    override fun onFailure(call: Call<Playlist>, t: Throwable) {
+                        Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+                    }
+
+                    override fun onResponse(call: Call<Playlist>, response: Response<Playlist>) {
+                        val playlist = response.body()!!
+                        val thirdCallback = apiService.addTracksToPlaylist(
+                            "Bearer $accessToken"
+                            , playlist.id!!, tracksString)
+                        thirdCallback.enqueue(object : Callback<Void> {
+                            override fun onFailure(call: Call<Void>, t: Throwable) {
+                                Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+                            }
+
+                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                _playlist.value = playlist
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    }
+
+    private fun nullOrJoinedElements(list: List<String>) : String? {
+        return if (list.isEmpty()) null else list.joinToString(",")
     }
 
 }
