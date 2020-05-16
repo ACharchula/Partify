@@ -26,6 +26,7 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
     val REDIRECT_URI = "partify://callback"
 
     private lateinit var viewModel: PlaylistViewModel
+    private lateinit var tracksRecycleViewAdapter : PlaylistTracksRecycleViewAdapter
     private var mSpotifyAppRemote: SpotifyAppRemote? = null
 
     private fun play() {
@@ -51,6 +52,11 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         SpotifyAppRemote.disconnect(mSpotifyAppRemote)
     }
 
+    override fun onResume() {
+        super.onResume()
+        connectToSpotifyAppRemote()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist)
@@ -58,7 +64,7 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         finalSeeds = intent.getSerializableExtra("final_seeds") as Seeds
         viewModel = ViewModelProvider(this).get(PlaylistViewModel::class.java)
 
-        val tracksRecycleViewAdapter : PlaylistTracksRecycleViewAdapter = if (viewModel.tracks.value != null)
+        tracksRecycleViewAdapter = if (viewModel.tracks.value != null)
             PlaylistTracksRecycleViewAdapter(viewModel.tracks.value!!)
         else
             PlaylistTracksRecycleViewAdapter(ObjectList(null))
@@ -66,13 +72,6 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         viewModel.tracks.observe(this, Observer {
             tracksRecycleViewAdapter.apply {
                 dataSource = it
-                notifyDataSetChanged()
-            }
-        })
-
-        viewModel.currentlyPlaying.observe(this, Observer {
-            tracksRecycleViewAdapter.apply {
-                currentlyPlaying = it
                 notifyDataSetChanged()
             }
         })
@@ -87,6 +86,11 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
             playlistArtist.text = allArtists.joinToString()
             playlistTrack.text = playerState.track.name //TODO add album
 
+            tracksRecycleViewAdapter.apply {
+                currentlyPlayingUri = playerState.track.uri
+                notifyDataSetChanged()
+            }
+
             if (playerState.isPaused) {
                 playButton.setImageResource(R.drawable.ic_play_arrow_white_48dp)
             } else {
@@ -98,10 +102,6 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
 
             duration.text = transformToMinutesAndSeconds(playerState.track.duration)
             playbackPosition.text = transformToMinutesAndSeconds(playerState.playbackPosition)
-
-            if (!viewModel.getCurrentTrack().name.equals(playerState.track.name)) {
-                viewModel.setIndexBasedOnName(playerState.track.name)
-            }
         })
 
         playlistListView.apply {
@@ -110,16 +110,14 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         }
 
         viewModel.playlist.observe(this, Observer {
-            if (!viewModel.isPlaylistStarted) {
-                viewModel.selectAtIndex(0)
+            if (!viewModel.hasPlaylistStarted) {
                 mSpotifyAppRemote!!.playerApi.play(viewModel.playlist.value!!.uri)
                 buttonLayout.visibility = View.VISIBLE
-                viewModel.isPlaylistStarted = true
+                viewModel.hasPlaylistStarted = true
             }
         })
 
         viewModel.getTracks(finalSeeds)
-        connectToSpotifyAppRemote()
 
         nextButton.setOnClickListener {
             next()
@@ -165,7 +163,6 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
     }
 
     override fun playSelectedTrack(position: Int) {
-        viewModel.selectAtIndex(position)
         mSpotifyAppRemote!!.playerApi.skipToIndex(viewModel.playlist.value!!.uri, position)
     }
 

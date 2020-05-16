@@ -19,10 +19,6 @@ class PlaylistViewModel : ViewModel() {
     val tracks: LiveData<ObjectList<Track>>
         get() = _tracks
 
-    private val _currentlyPlaying = MutableLiveData<Int>().apply { value = -1 }
-    val currentlyPlaying: LiveData<Int>
-        get() = _currentlyPlaying
-
     private val _playerState = MutableLiveData<PlayerState>()
     val playerState: LiveData<PlayerState>
         get() = _playerState
@@ -31,11 +27,7 @@ class PlaylistViewModel : ViewModel() {
     val playlist: LiveData<Playlist>
         get() = _playlist
 
-    var isPlaylistStarted: Boolean = false
-
-    fun selectAtIndex(i: Int) {
-        _currentlyPlaying.value = i
-    }
+    var hasPlaylistStarted: Boolean = false
 
     fun getTracks(seeds: Seeds) {
         if (_tracks.value == null)
@@ -44,36 +36,5 @@ class PlaylistViewModel : ViewModel() {
 
     fun setPlayerState(playerState: PlayerState) {
         _playerState.value = playerState
-    }
-
-    fun nextTrack()  {
-        if (_currentlyPlaying.value == _tracks.value!!.items!!.size - 1) {
-            _currentlyPlaying.value = 0
-        } else {
-            _currentlyPlaying.value = _currentlyPlaying.value?.plus(1)
-        }
-    }
-
-    fun previousTrack() {
-        if (_currentlyPlaying.value == 0) {
-            _currentlyPlaying.value = _tracks.value!!.items!!.size - 1
-        } else {
-            _currentlyPlaying.value = _currentlyPlaying.value?.minus(1)
-        }
-    }
-
-    fun getCurrentTrack(): Track {
-        return _tracks.value!!.items!![_currentlyPlaying.value!!]
-    }
-
-    fun setIndexBasedOnName(name: String?) {
-        var i = 0
-        for (track in _tracks.value!!.items!!) {
-            if (track.name == name) {
-                _currentlyPlaying.value = i
-            } else {
-                i++
-            }
-        }
     }
 }

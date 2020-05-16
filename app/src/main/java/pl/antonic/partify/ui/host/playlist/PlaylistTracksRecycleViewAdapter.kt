@@ -13,7 +13,7 @@ import pl.antonic.partify.R
 import pl.antonic.partify.model.spotify.ObjectList
 import pl.antonic.partify.model.spotify.Track
 
-class PlaylistTracksRecycleViewAdapter(var dataSource: ObjectList<Track>, var currentlyPlaying: Int = -1
+class PlaylistTracksRecycleViewAdapter(var dataSource: ObjectList<Track>, var currentlyPlayingUri: String = ""
 ) : RecyclerView.Adapter<PlaylistTracksRecycleViewAdapter.ViewHolder>() {
 
     class ViewHolder(playlistTrackRowView: View) : RecyclerView.ViewHolder(playlistTrackRowView) {
@@ -40,7 +40,7 @@ class PlaylistTracksRecycleViewAdapter(var dataSource: ObjectList<Track>, var cu
                 playlistTrackSelector.playSelectedTrack(position)
             }
 
-            if (currentlyPlaying == position) {
+            if (currentlyPlayingUri == uri) {
                 holder.playlistCardView.setCardBackgroundColor(ResourcesCompat.getColor(holder.itemView.context.resources, R.color.cardViewSecondaryColor, null))
             } else {
                 holder.playlistCardView.setCardBackgroundColor(ResourcesCompat.getColor(holder.itemView.context.resources, R.color.cardViewColor, null))
