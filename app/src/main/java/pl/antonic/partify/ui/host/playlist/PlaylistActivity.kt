@@ -1,10 +1,12 @@
 package pl.antonic.partify.ui.host.playlist
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +17,8 @@ import kotlinx.android.synthetic.main.activity_playlist.*
 import pl.antonic.partify.R
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.spotify.*
+import pl.antonic.partify.service.spotify.SpotifyService
+import pl.antonic.partify.ui.common.menu.MenuActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -28,24 +32,6 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
     private lateinit var viewModel: PlaylistViewModel
     private lateinit var tracksRecycleViewAdapter : PlaylistTracksRecycleViewAdapter
     private var mSpotifyAppRemote: SpotifyAppRemote? = null
-
-    private fun play() {
-        mSpotifyAppRemote!!.playerApi.resume()
-    }
-
-    private fun pause() {
-        mSpotifyAppRemote!!.playerApi.pause()
-    }
-
-    private fun next() {
-        mSpotifyAppRemote!!.playerApi!!.skipNext()
-        //viewModel.nextTrack()
-    }
-
-    private fun previous() {
-        mSpotifyAppRemote!!.playerApi!!.skipPrevious()
-        //viewModel.previousTrack()
-    }
 
     override fun onStop() {
         super.onStop()
@@ -150,16 +136,33 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 playbackPosition.text = transformToMinutesAndSeconds(p1.toLong())
             }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-
-            }
-
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {
                 mSpotifyAppRemote!!.playerApi.seekTo(p0!!.progress.toLong())
             }
 
         })
+
+        finalPlaylistCloseButton.setOnClickListener {
+            AlertDialog.Builder(this@PlaylistActivity,
+                R.style.AlertDialogCustom
+            ).setTitle("Closing")
+                .setMessage("Do you want to keep the playlist?")
+                .setPositiveButton("Yes") { _, _ ->
+                    goToMenu()
+                }.setNegativeButton("No") {_, _ ->
+                    viewModel.deletePlaylist()
+                    goToMenu()
+                }.setIcon(android.R.drawable.ic_menu_close_clear_cancel).show()
+        }
+    }
+
+    private fun goToMenu() {
+        mSpotifyAppRemote!!.playerApi.pause()
+        SpotifyAppRemote.disconnect(mSpotifyAppRemote)
+        val intent = Intent(this, MenuActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 
     override fun playSelectedTrack(position: Int) {
@@ -199,5 +202,21 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         return String.format("%02d:%02d",
         TimeUnit.MILLISECONDS.toMinutes(millis),
         TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)))
+    }
+
+    private fun play() {
+        mSpotifyAppRemote!!.playerApi.resume()
+    }
+
+    private fun pause() {
+        mSpotifyAppRemote!!.playerApi.pause()
+    }
+
+    private fun next() {
+        mSpotifyAppRemote!!.playerApi!!.skipNext()
+    }
+
+    private fun previous() {
+        mSpotifyAppRemote!!.playerApi!!.skipPrevious()
     }
 }

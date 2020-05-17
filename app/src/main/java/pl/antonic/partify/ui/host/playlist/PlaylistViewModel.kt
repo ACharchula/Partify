@@ -37,4 +37,8 @@ class PlaylistViewModel : ViewModel() {
     fun setPlayerState(playerState: PlayerState) {
         _playerState.value = playerState
     }
+
+    fun deletePlaylist() {
+        repository.deletePlaylist(_playlist.value!!.id, TokenService.getToken())
+    }
 }

@@ -230,4 +230,15 @@ class SpotifyService {
         return if (list.isEmpty()) null else list.joinToString(",")
     }
 
+    fun deletePlaylist(id: String?, accessToken: String) {
+        val apiService = getApiService()
+        val call = apiService.unfollowPlaylist("Bearer $accessToken", id!!)
+        call.enqueue(object : Callback<Void> {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("Fetch error", t.message)
+            }
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {}
+        })
+    }
+
 }
