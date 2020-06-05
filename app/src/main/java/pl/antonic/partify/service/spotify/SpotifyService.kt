@@ -8,6 +8,7 @@ import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.common.SelectableGenres
 import pl.antonic.partify.model.spotify.*
 import pl.antonic.partify.service.common.TokenService
+import pl.antonic.partify.service.common.UserService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -52,7 +53,7 @@ class SpotifyService {
         val call = apiService.getMe()
         call.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
-                Log.e("Fetch error", t.message)
+                Log.e("Fetch error", t.message!!)
             }
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 user.value = response.body()
@@ -67,7 +68,7 @@ class SpotifyService {
         val call = apiService.getTopUserArtists()
         call.enqueue(object : Callback<ObjectList<Artist>> {
             override fun onFailure(call: Call<ObjectList<Artist>>, t: Throwable) {
-                Log.e("Fetch error", t.message)
+                Log.e("Fetch error", t.message!!)
             }
             override fun onResponse(call: Call<ObjectList<Artist>>, response: Response<ObjectList<Artist>>) {
                 liveData.value = response.body()
@@ -80,7 +81,7 @@ class SpotifyService {
         val call = apiService.getTopUserTracks()
         call.enqueue(object : Callback<ObjectList<Track>> {
             override fun onFailure(call: Call<ObjectList<Track>>, t: Throwable) {
-                Log.e("Fetch error", t.message)
+                Log.e("Fetch error", t.message!!)
             }
             override fun onResponse(call: Call<ObjectList<Track>>, response: Response<ObjectList<Track>>) {
                 liveData.value = response.body()
@@ -93,7 +94,7 @@ class SpotifyService {
         val call = apiService.getAvailableGenres()
         call.enqueue(object : Callback<Genres> {
             override fun onFailure(call: Call<Genres>, t: Throwable) {
-                Log.e("Fetch error", t.message)
+                Log.e("Fetch error", t.message!!)
             }
             override fun onResponse(call: Call<Genres>, response: Response<Genres>) {
                 val allGenres = response.body()!!
@@ -118,7 +119,7 @@ class SpotifyService {
             val call = apiService.getTrack(trackId)
             call.enqueue(object : Callback<Track> {
                 override fun onFailure(call: Call<Track>, t: Throwable) {
-                    Log.e("Fetch error", t.message)
+                    Log.e("Fetch error", t.message!!)
                 }
                 override fun onResponse(call: Call<Track>, response: Response<Track>) {
                     trackList.add(response.body()!!)
@@ -142,7 +143,7 @@ class SpotifyService {
             val call = apiService.getArtist(artistId)
             call.enqueue(object : Callback<Artist> {
                 override fun onFailure(call: Call<Artist>, t: Throwable) {
-                    Log.e("Fetch error", t.message)
+                    Log.e("Fetch error", t.message!!)
                 }
                 override fun onResponse(call: Call<Artist>, response: Response<Artist>) {
                     artistList.add(response.body()!!)
@@ -171,7 +172,7 @@ class SpotifyService {
 
         call.enqueue(object : Callback<Recommendations> {
             override fun onFailure(call: Call<Recommendations>, t: Throwable) {
-                Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+                Log.e("Fetch error", t.message!!) // TODO error handling in every endpoint?
             }
 
             override fun onResponse(call: Call<Recommendations>, response: Response<Recommendations>) {
@@ -198,36 +199,26 @@ class SpotifyService {
 
         val apiService = getApiService()
 
-        val call = apiService.getMe()
-        call.enqueue(object : Callback<User> { //TODO get user id from object created at the start of the app
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+        val call = apiService.createPlaylist(
+            UserService.getUser().id!!,
+            CreatePlaylistData("Partify-" + System.currentTimeMillis())
+        )
+
+        call.enqueue(object : Callback<Playlist> {
+            override fun onFailure(call: Call<Playlist>, t: Throwable) {
+                Log.e("Fetch error", t.message!!)
             }
 
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                val user = response.body()!!
-                val secondCall = apiService.createPlaylist(
-                    user.id!!,
-                    CreatePlaylistData("Partify-" + System.currentTimeMillis())
-                )
-
-                secondCall.enqueue(object : Callback<Playlist> {
-                    override fun onFailure(call: Call<Playlist>, t: Throwable) {
-                        Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
+            override fun onResponse(call: Call<Playlist>, response: Response<Playlist>) {
+                val playlist = response.body()!!
+                val thirdCallback = apiService.addTracksToPlaylist(playlist.id!!, tracksString)
+                thirdCallback.enqueue(object : Callback<Void> {
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        Log.e("Fetch error", t.message!!)
                     }
 
-                    override fun onResponse(call: Call<Playlist>, response: Response<Playlist>) {
-                        val playlist = response.body()!!
-                        val thirdCallback = apiService.addTracksToPlaylist(playlist.id!!, tracksString)
-                        thirdCallback.enqueue(object : Callback<Void> {
-                            override fun onFailure(call: Call<Void>, t: Throwable) {
-                                Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
-                            }
-
-                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                _playlist.value = playlist
-                            }
-                        })
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        _playlist.value = playlist
                     }
                 })
             }
@@ -243,7 +234,7 @@ class SpotifyService {
         val call = apiService.unfollowPlaylist(id!!)
         call.enqueue(object : Callback<Void> {
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.e("Fetch error", t.message)
+                Log.e("Fetch error", t.message!!)
             }
             override fun onResponse(call: Call<Void>, response: Response<Void>) {}
         })
