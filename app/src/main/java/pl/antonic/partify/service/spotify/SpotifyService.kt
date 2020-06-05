@@ -28,8 +28,7 @@ class SpotifyService {
         return getService().create(SpotifyApi::class.java)
     }
 
-    fun getUser(accessToken: String) : MutableLiveData<User> {
-        val user = MutableLiveData<User>()
+    fun getUser(user: MutableLiveData<User>, accessToken: String) : MutableLiveData<User> {
 
         val apiService = getApiService()
         val call = apiService.getMe("Bearer $accessToken")

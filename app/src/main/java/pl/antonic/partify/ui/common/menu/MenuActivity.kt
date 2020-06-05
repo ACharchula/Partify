@@ -12,6 +12,7 @@ import pl.antonic.partify.ui.user.discover.DiscoverActivity
 import pl.antonic.partify.R
 import pl.antonic.partify.ui.host.advertise.AdvertiseActivity
 import pl.antonic.partify.service.common.TokenService
+import pl.antonic.partify.service.common.UserService
 import pl.antonic.partify.ui.common.main.MainActivity
 
 class MenuActivity : AppCompatActivity() {
@@ -37,13 +38,16 @@ class MenuActivity : AppCompatActivity() {
             AuthorizationClient.clearCookies(this)
             TokenService.delete(this)
             val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
     }
 
     private fun loadProfile() {
         val model : MenuViewModel by viewModels()
+        model.getUserData()
         model.user.observe(this, Observer {
+            UserService.setUser(it)
             if (it.images != null)
                 Picasso.get().load(it.images!![0].url).into(profilePictureImageView)
             if (it.display_name != null) {

@@ -19,6 +19,7 @@ import com.google.android.gms.nearby.connection.*
 import kotlinx.android.synthetic.main.activity_advertise.*
 import pl.antonic.partify.R
 import pl.antonic.partify.model.common.UserSelections
+import pl.antonic.partify.service.common.UserService
 import pl.antonic.partify.ui.host.selection.user.HostSeedSelectionActivity
 
 
@@ -122,7 +123,7 @@ class AdvertiseActivity : AppCompatActivity() {
         }
 
         connectionsClient
-            .startAdvertising("Antek Charchuła", "pl.antonic.partify", mConnectionLifecycleCallback, advertisingOptions) //TODO change to username
+            .startAdvertising("Host: " + UserService.getUser().display_name!!, "pl.antonic.partify", mConnectionLifecycleCallback, advertisingOptions) //TODO change to username
             .addOnFailureListener {
                 Toast.makeText(this, "Couldn't start advertising :(", Toast.LENGTH_SHORT).show()
             }.addOnSuccessListener {

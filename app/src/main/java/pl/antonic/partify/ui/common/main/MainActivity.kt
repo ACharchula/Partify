@@ -30,10 +30,10 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.BLUETOOTH_ADMIN,
         Manifest.permission.ACCESS_WIFI_STATE,
         Manifest.permission.CHANGE_WIFI_STATE,
-        Manifest.permission.ACCESS_COARSE_LOCATION
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onStart() {
         super.onStart()
         if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {

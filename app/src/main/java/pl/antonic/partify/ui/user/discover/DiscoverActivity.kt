@@ -10,6 +10,7 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import pl.antonic.partify.service.common.NearbyClientService
 import pl.antonic.partify.R
+import pl.antonic.partify.service.common.UserService
 import pl.antonic.partify.ui.user.selection.UserSeedSelectionActivity
 
 class DiscoverActivity : AppCompatActivity() {
@@ -78,7 +79,7 @@ class DiscoverActivity : AppCompatActivity() {
 
         val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
             override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-                NearbyClientService.get().requestConnection("nickname1", endpointId, mConnectionLifecycleCallback) //TODO change to username
+                NearbyClientService.get().requestConnection(UserService.getUser().display_name!!, endpointId, mConnectionLifecycleCallback) //TODO change to username
             }
             override fun onEndpointLost(endpointId: String) {}
         }
