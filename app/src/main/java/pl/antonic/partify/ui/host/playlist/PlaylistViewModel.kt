@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.spotify.protocol.types.PlayerState
+import pl.antonic.partify.model.common.Attributes
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.spotify.ObjectList
 import pl.antonic.partify.model.spotify.Playlist
@@ -29,9 +30,9 @@ class PlaylistViewModel : ViewModel() {
 
     var hasPlaylistStarted: Boolean = false
 
-    fun getTracks(seeds: Seeds) {
+    fun getTracks(seeds: Seeds, attr: Attributes) {
         if (_tracks.value == null)
-            repository.getRecommendationsInNewPlaylist(_tracks, _playlist, seeds)
+            repository.getRecommendationsInNewPlaylist(_tracks, _playlist, seeds, attr)
     }
 
     fun setPlayerState(playerState: PlayerState) {

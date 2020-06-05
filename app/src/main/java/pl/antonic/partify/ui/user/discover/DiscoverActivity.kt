@@ -23,7 +23,7 @@ class DiscoverActivity : AppCompatActivity() {
 
         NearbyClientService.set(Nearby.getConnectionsClient(this))
 
-        val vm: DiscoverViewModel by viewModels()
+        val vm: DiscoverViewModel by viewModels() //TODO change this
         viewModel = vm
 
         if (!viewModel.isDiscovering)
@@ -79,7 +79,7 @@ class DiscoverActivity : AppCompatActivity() {
 
         val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
             override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-                NearbyClientService.get().requestConnection(UserService.getUser().display_name!!, endpointId, mConnectionLifecycleCallback) //TODO change to username
+                NearbyClientService.get().requestConnection(UserService.getUser().display_name!!, endpointId, mConnectionLifecycleCallback)
             }
             override fun onEndpointLost(endpointId: String) {}
         }

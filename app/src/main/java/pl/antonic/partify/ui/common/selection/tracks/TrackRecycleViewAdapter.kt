@@ -40,7 +40,7 @@ class TrackRecycleViewAdapter(private val dataSource: ObjectList<Track>)
         val listModificator = holder.itemView.context as SeedListModificator
         dataSource.items!![position].apply {
 
-            holder.trackCheckBox.setOnClickListener {//TODO check the selected flags neccessity
+            holder.trackCheckBox.setOnClickListener {
                 if (!holder.trackCheckBox.isChecked) {
                     listModificator.removeId(id!!, SeedType.TRACK)
                     selected = false

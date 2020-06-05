@@ -15,6 +15,7 @@ import com.spotify.android.appremote.api.Connector.ConnectionListener
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import kotlinx.android.synthetic.main.activity_playlist.*
 import pl.antonic.partify.R
+import pl.antonic.partify.model.common.Attributes
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.spotify.*
 import pl.antonic.partify.service.spotify.SpotifyService
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit
 class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
 
     private lateinit var finalSeeds : Seeds
+    private lateinit var attributes : Attributes
 
     val CLIENT_ID = "871a79f969aa43f4923bfa59a852d6fe"
     val REDIRECT_URI = "partify://callback"
@@ -43,11 +45,16 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         connectToSpotifyAppRemote()
     }
 
+    override fun onBackPressed() {
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist)
 
         finalSeeds = intent.getSerializableExtra("final_seeds") as Seeds
+        attributes = intent.getSerializableExtra("attributes") as Attributes
+
         viewModel = ViewModelProvider(this).get(PlaylistViewModel::class.java)
 
         tracksRecycleViewAdapter = if (viewModel.tracks.value != null)
@@ -185,7 +192,7 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
                     mSpotifyAppRemote!!.playerApi.setRepeat(1)
                     subscribeToPlayerState()
                     if (!viewModel.hasPlaylistStarted) {
-                        viewModel.getTracks(finalSeeds)
+                        viewModel.getTracks(finalSeeds, attributes)
                     }
                 }
             })

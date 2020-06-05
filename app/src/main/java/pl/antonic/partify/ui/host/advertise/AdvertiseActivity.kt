@@ -124,7 +124,7 @@ class AdvertiseActivity : AppCompatActivity() {
         }
 
         connectionsClient
-            .startAdvertising("Host: " + UserService.getUser().display_name!!, "pl.antonic.partify", mConnectionLifecycleCallback, advertisingOptions) //TODO change to username
+            .startAdvertising("Host: " + UserService.getUser().display_name!!, "pl.antonic.partify", mConnectionLifecycleCallback, advertisingOptions)
             .addOnFailureListener {
                 Toast.makeText(this, "Couldn't start advertising :(", Toast.LENGTH_SHORT).show()
             }.addOnSuccessListener {

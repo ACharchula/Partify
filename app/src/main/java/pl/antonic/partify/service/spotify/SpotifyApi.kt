@@ -18,8 +18,6 @@ interface SpotifyApi {
     @GET("recommendations/available-genre-seeds")
     fun getAvailableGenres() : Call<Genres>
 
-    //TODO maybe better to use tracks with several ids - maximum ids number is 50 - same with artists
-
     @GET("tracks/{id}")
     fun getTrack(@Path("id") id: String) : Call<Track>
 
@@ -28,6 +26,13 @@ interface SpotifyApi {
 
     @GET("recommendations")
     fun getRecommendations(@Query("market") market: String,
+                           @Query("limit") limit: String?,
+                           @Query("target_acousticness") acousticness: String?,
+                           @Query("target_danceability") danceability: String?,
+                           @Query("target_energy") energy: String?,
+                           @Query("target_instrumentalness") instrumentalness: String?,
+                           @Query("target_popularity") popularity: String?,
+                           @Query("target_valence") valence: String?,
                            @Query("seed_artists") seedArtists: String?,
                            @Query("seed_genres") seedGenres: String?,
                            @Query("seed_tracks") seedTracks: String?) : Call<Recommendations>

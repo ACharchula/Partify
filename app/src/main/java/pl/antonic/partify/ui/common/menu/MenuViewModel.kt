@@ -17,7 +17,7 @@ class MenuViewModel : ViewModel() {
     val user: LiveData<User>
         get() = _user
 
-    public fun getUserData() { //TODO token storing
+    fun getUserData() {
         if (_user.value == null) {
             repository.getUser(_user)
         }

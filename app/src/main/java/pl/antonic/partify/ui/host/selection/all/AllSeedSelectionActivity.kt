@@ -4,7 +4,7 @@ import android.content.Intent
 import pl.antonic.partify.model.common.SeedType
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.ui.common.selection.SeedSelectionActivity
-import pl.antonic.partify.ui.host.playlist.PlaylistActivity
+import pl.antonic.partify.ui.host.attributes.TrackAttributesActivity
 
 class AllSeedSelectionActivity : SeedSelectionActivity() {
 
@@ -29,7 +29,7 @@ class AllSeedSelectionActivity : SeedSelectionActivity() {
     }
 
     override fun nextButtonOnClick() {
-        val intent = Intent(this, PlaylistActivity::class.java)
+        val intent = Intent(this, TrackAttributesActivity::class.java)
         intent.putExtra("final_seeds", getSeeds())
         startActivity(intent)
     }

@@ -10,7 +10,6 @@ import pl.antonic.partify.model.common.UserSelections
 
 class AdvertiseViewModel : ViewModel() {
 
-    //TODO is live data needed here?
     private val _allSeeds = MutableLiveData<MutableList<UserSelections>>()
         .apply { value = mutableListOf() }
     val allSeeds: LiveData<MutableList<UserSelections>>
@@ -18,11 +17,11 @@ class AdvertiseViewModel : ViewModel() {
 
     var isAdvertising = false
 
-    public fun addUserSelections(userSelections: UserSelections) {
+    fun addUserSelections(userSelections: UserSelections) {
         _allSeeds.value!!.add(userSelections)
     }
 
-    public fun getCombinedSeeds() : Seeds {
+    fun getCombinedSeeds() : Seeds {
         var seeds = Seeds()
         for (user in allSeeds.value!!) {
             if (user.seeds != null)
@@ -40,8 +39,8 @@ class AdvertiseViewModel : ViewModel() {
                     user.seeds = seeds
                     break
                 }
-            } //TODO what if there is no such endpoint id?
-        }
+            }
+        }//TODO what if there is no such endpoint id?
     }
 
     fun remove(userId: String) {

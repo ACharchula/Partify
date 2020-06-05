@@ -3,6 +3,7 @@ package pl.antonic.partify.service.spotify
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import okhttp3.OkHttpClient
+import pl.antonic.partify.model.common.Attributes
 import pl.antonic.partify.model.common.SeedType
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.common.SelectableGenres
@@ -159,7 +160,7 @@ class SpotifyService {
     fun getRecommendationsInNewPlaylist(
         _tracks: MutableLiveData<ObjectList<Track>>,
         _playlist: MutableLiveData<Playlist>,
-        seeds: Seeds
+        seeds: Seeds, attributes: Attributes
     ) {
         val apiService = getApiService()
 
@@ -167,7 +168,10 @@ class SpotifyService {
         val seedTracks: String? = nullOrJoinedElements(seeds.getList(SeedType.TRACK))
         val seedGenres: String? = nullOrJoinedElements(seeds.getList(SeedType.GENRE))
 
-        val call = apiService.getRecommendations(UserService.getUser().country!!, seedArtists, seedGenres, seedTracks)
+        val call = apiService.getRecommendations(UserService.getUser().country!!,
+            attributes.limit, attributes.acousticness, attributes.danceability, attributes.energy,
+            attributes.instrumentalness, attributes.popularity, attributes.valence,
+            seedArtists, seedGenres, seedTracks)
 
         call.enqueue(object : Callback<Recommendations> {
             override fun onFailure(call: Call<Recommendations>, t: Throwable) {
