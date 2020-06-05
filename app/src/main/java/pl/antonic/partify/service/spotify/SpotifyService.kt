@@ -2,10 +2,12 @@ package pl.antonic.partify.service.spotify
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import okhttp3.OkHttpClient
 import pl.antonic.partify.model.common.SeedType
 import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.common.SelectableGenres
 import pl.antonic.partify.model.spotify.*
+import pl.antonic.partify.service.common.TokenService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,12 +17,28 @@ import retrofit2.converter.gson.GsonConverterFactory
 class SpotifyService {
     companion object {
         private const val SPOTIFY_WEB_API_ENDPOINT = "https://api.spotify.com/v1/"
+        private var service: Retrofit? = null
 
         fun getService() : Retrofit {
-            return Retrofit.Builder()
-                .baseUrl(SPOTIFY_WEB_API_ENDPOINT)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            if (service != null) {
+                return service!!
+            } else {
+                val httpClient = OkHttpClient.Builder()
+
+                httpClient.addInterceptor { chain ->
+                    val request = chain.request()
+                        .newBuilder()
+                        .addHeader("Authorization", "Bearer " + TokenService.getToken())
+                        .build()
+                    chain.proceed(request)
+                }
+
+                return Retrofit.Builder()
+                    .baseUrl(SPOTIFY_WEB_API_ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build())
+                    .build()
+            }
         }
     }
 
@@ -28,10 +46,10 @@ class SpotifyService {
         return getService().create(SpotifyApi::class.java)
     }
 
-    fun getUser(user: MutableLiveData<User>, accessToken: String) : MutableLiveData<User> {
+    fun getUser(user: MutableLiveData<User>) : MutableLiveData<User> {
 
         val apiService = getApiService()
-        val call = apiService.getMe("Bearer $accessToken")
+        val call = apiService.getMe()
         call.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
                 Log.e("Fetch error", t.message)
@@ -44,9 +62,9 @@ class SpotifyService {
         return user
     }
 
-    fun getArtists(liveData: MutableLiveData<ObjectList<Artist>>, accessToken: String){
+    fun getArtists(liveData: MutableLiveData<ObjectList<Artist>>){
         val apiService = getApiService()
-        val call = apiService.getTopUserArtists("Bearer $accessToken")
+        val call = apiService.getTopUserArtists()
         call.enqueue(object : Callback<ObjectList<Artist>> {
             override fun onFailure(call: Call<ObjectList<Artist>>, t: Throwable) {
                 Log.e("Fetch error", t.message)
@@ -57,9 +75,9 @@ class SpotifyService {
         })
     }
 
-    fun getTracks(liveData: MutableLiveData<ObjectList<Track>>, accessToken: String) {
+    fun getTracks(liveData: MutableLiveData<ObjectList<Track>>) {
         val apiService = getApiService()
-        val call = apiService.getTopUserTracks("Bearer $accessToken")
+        val call = apiService.getTopUserTracks()
         call.enqueue(object : Callback<ObjectList<Track>> {
             override fun onFailure(call: Call<ObjectList<Track>>, t: Throwable) {
                 Log.e("Fetch error", t.message)
@@ -70,9 +88,9 @@ class SpotifyService {
         })
     }
 
-    fun getGenres(liveData: MutableLiveData<SelectableGenres>, accessToken: String) {
+    fun getGenres(liveData: MutableLiveData<SelectableGenres>) {
         val apiService =getApiService()
-        val call = apiService.getAvailableGenres("Bearer $accessToken")
+        val call = apiService.getAvailableGenres()
         call.enqueue(object : Callback<Genres> {
             override fun onFailure(call: Call<Genres>, t: Throwable) {
                 Log.e("Fetch error", t.message)
@@ -91,14 +109,13 @@ class SpotifyService {
 
     fun getTracks(
         liveData: MutableLiveData<ObjectList<Track>>,
-        ids: List<String>,
-        accessToken: String
+        ids: List<String>
     ) {
         val trackList = mutableListOf<Track>()
         val apiService = getApiService()
 
         for (trackId in ids) {
-            val call = apiService.getTrack("Bearer $accessToken", trackId)
+            val call = apiService.getTrack(trackId)
             call.enqueue(object : Callback<Track> {
                 override fun onFailure(call: Call<Track>, t: Throwable) {
                     Log.e("Fetch error", t.message)
@@ -116,14 +133,13 @@ class SpotifyService {
 
     fun getArtists(
         liveData: MutableLiveData<ObjectList<Artist>>,
-        ids: List<String>,
-        accessToken: String
+        ids: List<String>
     ) {
         val artistList = mutableListOf<Artist>()
         val apiService = getApiService()
 
         for (artistId in ids) {
-            val call = apiService.getArtist("Bearer $accessToken", artistId)
+            val call = apiService.getArtist(artistId)
             call.enqueue(object : Callback<Artist> {
                 override fun onFailure(call: Call<Artist>, t: Throwable) {
                     Log.e("Fetch error", t.message)
@@ -142,8 +158,7 @@ class SpotifyService {
     fun getRecommendationsInNewPlaylist(
         _tracks: MutableLiveData<ObjectList<Track>>,
         _playlist: MutableLiveData<Playlist>,
-        seeds: Seeds,
-        accessToken: String
+        seeds: Seeds
     ) {
         val apiService = getApiService()
 
@@ -152,9 +167,7 @@ class SpotifyService {
         val seedGenres: String? = nullOrJoinedElements(seeds.getList(SeedType.GENRE))
 
         //TODO change market to get from user
-        val call = apiService.getRecommendations(
-            "Bearer $accessToken"
-            , "PL", seedArtists, seedGenres, seedTracks)
+        val call = apiService.getRecommendations("PL", seedArtists, seedGenres, seedTracks)
 
         call.enqueue(object : Callback<Recommendations> {
             override fun onFailure(call: Call<Recommendations>, t: Throwable) {
@@ -167,14 +180,13 @@ class SpotifyService {
                 //TODO check if tracks can be null
                 val tracks = recommendations.tracks!!
                 _tracks.value = ObjectList(tracks)
-                createPlaylistAndAddTracks(tracks, _playlist, accessToken)
+                createPlaylistAndAddTracks(tracks, _playlist)
             }
         })
     }
 
     private fun createPlaylistAndAddTracks(tracks: List<Track>,
-                                           _playlist: MutableLiveData<Playlist>,
-                                           accessToken: String) {
+                                           _playlist: MutableLiveData<Playlist>) {
 
         val tracksURIs = mutableListOf<String>()
 
@@ -186,7 +198,7 @@ class SpotifyService {
 
         val apiService = getApiService()
 
-        val call = apiService.getMe("Bearer $accessToken")
+        val call = apiService.getMe()
         call.enqueue(object : Callback<User> { //TODO get user id from object created at the start of the app
             override fun onFailure(call: Call<User>, t: Throwable) {
                 Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
@@ -195,7 +207,6 @@ class SpotifyService {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 val user = response.body()!!
                 val secondCall = apiService.createPlaylist(
-                    "Bearer $accessToken",
                     user.id!!,
                     CreatePlaylistData("Partify-" + System.currentTimeMillis())
                 )
@@ -207,9 +218,7 @@ class SpotifyService {
 
                     override fun onResponse(call: Call<Playlist>, response: Response<Playlist>) {
                         val playlist = response.body()!!
-                        val thirdCallback = apiService.addTracksToPlaylist(
-                            "Bearer $accessToken"
-                            , playlist.id!!, tracksString)
+                        val thirdCallback = apiService.addTracksToPlaylist(playlist.id!!, tracksString)
                         thirdCallback.enqueue(object : Callback<Void> {
                             override fun onFailure(call: Call<Void>, t: Throwable) {
                                 Log.e("Fetch error", t.message) // TODO error handling in every endpoint?
@@ -229,9 +238,9 @@ class SpotifyService {
         return if (list.isEmpty()) null else list.joinToString(",")
     }
 
-    fun deletePlaylist(id: String?, accessToken: String) {
+    fun deletePlaylist(id: String?) {
         val apiService = getApiService()
-        val call = apiService.unfollowPlaylist("Bearer $accessToken", id!!)
+        val call = apiService.unfollowPlaylist(id!!)
         call.enqueue(object : Callback<Void> {
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 Log.e("Fetch error", t.message)

@@ -70,7 +70,7 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
                 allArtists.add(artist.name!!)
             }
             playlistArtist.text = allArtists.joinToString()
-            playlistTrack.text = playerState.track.name //TODO add album
+            playlistTrack.text = playerState.track.name
 
             tracksRecycleViewAdapter.apply {
                 currentlyPlayingUri = playerState.track.uri

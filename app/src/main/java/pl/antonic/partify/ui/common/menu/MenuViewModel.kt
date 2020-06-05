@@ -19,7 +19,7 @@ class MenuViewModel : ViewModel() {
 
     public fun getUserData() { //TODO token storing
         if (_user.value == null) {
-            repository.getUser(_user, TokenService.getToken())
+            repository.getUser(_user)
         }
     }
 

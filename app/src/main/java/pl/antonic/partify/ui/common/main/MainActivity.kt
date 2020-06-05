@@ -4,12 +4,10 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.CallSuper
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
@@ -107,7 +105,7 @@ class MainActivity : AppCompatActivity() {
 
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN ->  {
-                    TokenService.store(this, response.accessToken)
+                    TokenService.save(response.accessToken)
                     goToMenu()
                 }
                 AuthorizationResponse.Type.ERROR -> Toast.makeText(this, "Authorization error", Toast.LENGTH_SHORT).show()

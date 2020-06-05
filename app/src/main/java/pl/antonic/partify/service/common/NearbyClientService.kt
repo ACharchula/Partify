@@ -4,14 +4,14 @@ import com.google.android.gms.nearby.connection.ConnectionsClient
 
 class NearbyClientService {
     companion object {
-        private lateinit var connectionsClient: ConnectionsClient
+        private var connectionsClient: ConnectionsClient? = null
 
-        public fun set(connectionsClient: ConnectionsClient) {
+        fun set(connectionsClient: ConnectionsClient) {
             Companion.connectionsClient = connectionsClient
         }
 
-        public fun get() : ConnectionsClient {
-            return connectionsClient
+        fun get() : ConnectionsClient {
+            return connectionsClient!!
         }
     }
 }

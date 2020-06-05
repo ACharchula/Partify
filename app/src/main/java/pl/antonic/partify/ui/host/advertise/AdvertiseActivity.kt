@@ -69,6 +69,7 @@ class AdvertiseActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
+        connectionsClient.stopAllEndpoints()
         connectionsClient.stopAdvertising()
     }
 

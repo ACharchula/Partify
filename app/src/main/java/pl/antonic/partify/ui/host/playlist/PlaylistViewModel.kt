@@ -31,7 +31,7 @@ class PlaylistViewModel : ViewModel() {
 
     fun getTracks(seeds: Seeds) {
         if (_tracks.value == null)
-            repository.getRecommendationsInNewPlaylist(_tracks, _playlist, seeds, TokenService.getToken())
+            repository.getRecommendationsInNewPlaylist(_tracks, _playlist, seeds)
     }
 
     fun setPlayerState(playerState: PlayerState) {
@@ -39,6 +39,6 @@ class PlaylistViewModel : ViewModel() {
     }
 
     fun deletePlaylist() {
-        repository.deletePlaylist(_playlist.value!!.id, TokenService.getToken())
+        repository.deletePlaylist(_playlist.value!!.id)
     }
 }

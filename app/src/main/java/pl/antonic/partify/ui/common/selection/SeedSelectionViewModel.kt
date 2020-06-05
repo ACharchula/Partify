@@ -31,27 +31,27 @@ class SeedSelectionViewModel : ViewModel() {
 
     fun getArtists() {
         if (_artists.value == null)
-            repository.getArtists(_artists, TokenService.getToken())
+            repository.getArtists(_artists)
     }
 
     fun getTracks() {
         if (_tracks.value == null)
-            repository.getTracks(_tracks, TokenService.getToken())
+            repository.getTracks(_tracks)
     }
 
     fun getGenres() {
         if (_genres.value == null)
-            repository.getGenres(_genres, TokenService.getToken())
+            repository.getGenres(_genres)
     }
 
     fun getArtists(ids: List<String>) {
         if (_artists.value == null)
-            repository.getArtists(_artists, ids, TokenService.getToken())
+            repository.getArtists(_artists, ids)
     }
 
     fun getTracks(ids: List<String>) {
         if (_tracks.value == null)
-            repository.getTracks(_tracks, ids, TokenService.getToken())
+            repository.getTracks(_tracks, ids)
     }
 
     fun getGenres(ids: List<String>) {

@@ -6,11 +6,11 @@ class UserService {
     companion object {
         private lateinit var user: User
 
-        public fun setUser(user: User) {
+        fun setUser(user: User) {
             this.user = user;
         }
 
-        public fun getUser(): User {
+        fun getUser(): User {
             return this.user
         }
     }
