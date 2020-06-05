@@ -167,18 +167,16 @@ class SpotifyService {
         val seedTracks: String? = nullOrJoinedElements(seeds.getList(SeedType.TRACK))
         val seedGenres: String? = nullOrJoinedElements(seeds.getList(SeedType.GENRE))
 
-        //TODO change market to get from user
-        val call = apiService.getRecommendations("PL", seedArtists, seedGenres, seedTracks)
+        val call = apiService.getRecommendations(UserService.getUser().country!!, seedArtists, seedGenres, seedTracks)
 
         call.enqueue(object : Callback<Recommendations> {
             override fun onFailure(call: Call<Recommendations>, t: Throwable) {
-                Log.e("Fetch error", t.message!!) // TODO error handling in every endpoint?
+                Log.e("Fetch error", t.message!!)
             }
 
             override fun onResponse(call: Call<Recommendations>, response: Response<Recommendations>) {
                 val recommendations = response.body()!!
 
-                //TODO check if tracks can be null
                 val tracks = recommendations.tracks!!
                 _tracks.value = ObjectList(tracks)
                 createPlaylistAndAddTracks(tracks, _playlist)

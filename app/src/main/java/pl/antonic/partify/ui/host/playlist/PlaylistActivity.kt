@@ -103,8 +103,6 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
             }
         })
 
-        viewModel.getTracks(finalSeeds)
-
         nextButton.setOnClickListener {
             next()
         }
@@ -184,8 +182,11 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
 
                 override fun onConnected(spotifyAppRemote: SpotifyAppRemote?) {
                     mSpotifyAppRemote = spotifyAppRemote
-                    //TODO CHECK WHICH NUMBER mSpotifyAppRemote.playerApi.setRepeat() if it is in loop
+                    mSpotifyAppRemote!!.playerApi.setRepeat(1)
                     subscribeToPlayerState()
+                    if (!viewModel.hasPlaylistStarted) {
+                        viewModel.getTracks(finalSeeds)
+                    }
                 }
             })
     }

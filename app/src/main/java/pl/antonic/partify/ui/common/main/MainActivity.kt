@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(
                     "streaming",
                     "user-read-recently-played",
+                    "user-read-private",
                     "user-top-read",
                     "playlist-modify-private",
                     "playlist-modify-public"
