@@ -4,12 +4,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import pl.antonic.partify.model.common.Attributes
+import pl.antonic.partify.model.common.Seeds
+import pl.antonic.partify.model.spotify.Playlist
+import pl.antonic.partify.service.spotify.SpotifyService
 
 class TrackAttributesViewModel : ViewModel() {
+    private val repository = SpotifyService()
+
     private val _attr = MutableLiveData<Attributes>().apply {
         value = Attributes("1", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0") }
     val attr: LiveData<Attributes>
         get() = _attr
+
+    private val _playlist = MutableLiveData<Playlist>()
+    val playlist: LiveData<Playlist>
+        get() = _playlist
 
     private fun notifyObserver() {
         _attr.value = _attr.value
@@ -55,5 +64,9 @@ class TrackAttributesViewModel : ViewModel() {
         val value = text.toFloat()
         _attr.value!!.valence = (value/100).toString()
         notifyObserver()
+    }
+
+    fun getRecommendations(seeds: Seeds, attr: Attributes) {
+        repository.getRecommendationsInNewPlaylist(_playlist, seeds, attr)
     }
 }

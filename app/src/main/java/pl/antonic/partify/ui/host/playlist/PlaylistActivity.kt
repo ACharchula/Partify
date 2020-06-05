@@ -25,8 +25,7 @@ import java.util.concurrent.TimeUnit
 
 class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
 
-    private lateinit var finalSeeds : Seeds
-    private lateinit var attributes : Attributes
+    private lateinit var playlist : Playlist
 
     val CLIENT_ID = "871a79f969aa43f4923bfa59a852d6fe"
     val REDIRECT_URI = "partify://callback"
@@ -52,10 +51,10 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist)
 
-        finalSeeds = intent.getSerializableExtra("final_seeds") as Seeds
-        attributes = intent.getSerializableExtra("attributes") as Attributes
-
+        playlist = intent.getSerializableExtra("playlist") as Playlist
         viewModel = ViewModelProvider(this).get(PlaylistViewModel::class.java)
+
+        viewModel.setIfNull(playlist)
 
         tracksRecycleViewAdapter = if (viewModel.tracks.value != null)
             PlaylistTracksRecycleViewAdapter(viewModel.tracks.value!!)
@@ -102,13 +101,13 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
             adapter = tracksRecycleViewAdapter
         }
 
-        viewModel.playlist.observe(this, Observer {
-            if (!viewModel.hasPlaylistStarted) {
-                mSpotifyAppRemote!!.playerApi.play(viewModel.playlist.value!!.uri)
-                buttonLayout.visibility = View.VISIBLE
-                viewModel.hasPlaylistStarted = true
-            }
-        })
+//        viewModel.playlist.observe(this, Observer {
+//            if (!viewModel.hasPlaylistStarted) {
+//                mSpotifyAppRemote!!.playerApi.play(viewModel.playlist.value!!.uri)
+//                buttonLayout.visibility = View.VISIBLE
+//                viewModel.hasPlaylistStarted = true
+//            }
+//        })
 
         nextButton.setOnClickListener {
             next()
@@ -192,7 +191,9 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
                     mSpotifyAppRemote!!.playerApi.setRepeat(1)
                     subscribeToPlayerState()
                     if (!viewModel.hasPlaylistStarted) {
-                        viewModel.getTracks(finalSeeds, attributes)
+                        mSpotifyAppRemote!!.playerApi.play(viewModel.playlist.value!!.uri)
+                        buttonLayout.visibility = View.VISIBLE
+                        viewModel.hasPlaylistStarted = true
                     }
                 }
             })

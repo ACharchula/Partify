@@ -1,6 +1,8 @@
 package pl.antonic.partify.model.spotify
 
-class Image {
+import java.io.Serializable
+
+class Image : Serializable {
     var width: Int? = null
     var height: Int? = null
     var url: String? = null

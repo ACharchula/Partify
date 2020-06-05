@@ -158,7 +158,6 @@ class SpotifyService {
     }
 
     fun getRecommendationsInNewPlaylist(
-        _tracks: MutableLiveData<ObjectList<Track>>,
         _playlist: MutableLiveData<Playlist>,
         seeds: Seeds, attributes: Attributes
     ) {
@@ -179,10 +178,13 @@ class SpotifyService {
             }
 
             override fun onResponse(call: Call<Recommendations>, response: Response<Recommendations>) {
+                if (response.body() == null) {
+                    _playlist.value = _playlist.value
+                    return
+                }
                 val recommendations = response.body()!!
 
                 val tracks = recommendations.tracks!!
-                _tracks.value = ObjectList(tracks)
                 createPlaylistAndAddTracks(tracks, _playlist)
             }
         })
@@ -220,6 +222,7 @@ class SpotifyService {
                     }
 
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        playlist.tracks = ObjectList(tracks)
                         _playlist.value = playlist
                     }
                 })

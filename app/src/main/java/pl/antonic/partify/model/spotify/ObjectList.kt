@@ -1,3 +1,5 @@
 package pl.antonic.partify.model.spotify
 
-class ObjectList<T>(var items: List<T>? = null)
+import java.io.Serializable
+
+class ObjectList<T>(var items: List<T>? = null) : Serializable

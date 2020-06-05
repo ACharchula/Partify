@@ -16,7 +16,7 @@ class PlaylistViewModel : ViewModel() {
 
     private val repository = SpotifyService()
 
-    private val _tracks = MutableLiveData<ObjectList<Track>>()
+    private val _tracks = MutableLiveData<ObjectList<Track>>() //TODO get rid of it
     val tracks: LiveData<ObjectList<Track>>
         get() = _tracks
 
@@ -30,16 +30,18 @@ class PlaylistViewModel : ViewModel() {
 
     var hasPlaylistStarted: Boolean = false
 
-    fun getTracks(seeds: Seeds, attr: Attributes) {
-        if (_tracks.value == null)
-            repository.getRecommendationsInNewPlaylist(_tracks, _playlist, seeds, attr)
-    }
-
     fun setPlayerState(playerState: PlayerState) {
         _playerState.value = playerState
     }
 
     fun deletePlaylist() {
         repository.deletePlaylist(_playlist.value!!.id)
+    }
+
+    fun setIfNull(playlist: Playlist) {
+        if (_playlist.value == null) {
+            _playlist.value = playlist
+            _tracks.value = playlist.tracks
+        }
     }
 }

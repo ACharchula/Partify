@@ -1,6 +1,8 @@
 package pl.antonic.partify.model.spotify
 
-open class Artist {
+import java.io.Serializable
+
+open class Artist : Serializable {
     var id: String? = null
     var images: List<Image>? = null
     var name: String? = null

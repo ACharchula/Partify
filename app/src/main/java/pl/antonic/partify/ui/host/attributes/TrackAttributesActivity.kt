@@ -1,18 +1,23 @@
 package pl.antonic.partify.ui.host.attributes
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_track_attributes.*
 import pl.antonic.partify.R
 import pl.antonic.partify.model.common.Attributes
 import pl.antonic.partify.model.common.Seeds
+import pl.antonic.partify.model.spotify.Playlist
 import pl.antonic.partify.ui.host.playlist.PlaylistActivity
 
 class TrackAttributesActivity : AppCompatActivity() {
@@ -23,6 +28,7 @@ class TrackAttributesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_track_attributes)
+        lockRotation()
 
         viewModel = ViewModelProvider(this).get(TrackAttributesViewModel::class.java)
         finalSeeds = intent.getSerializableExtra("final_seeds") as Seeds
@@ -31,11 +37,22 @@ class TrackAttributesActivity : AppCompatActivity() {
         setObservers()
 
         attributesNextButton.setOnClickListener {
-            val intent = Intent(this, PlaylistActivity::class.java)
-            intent.putExtra("final_seeds", finalSeeds)
-            intent.putExtra("attributes", getFinalAttributes())
-            startActivity(intent)
+            attributesNextButton.visibility = View.GONE
+            loadingRecommendations.visibility = View.VISIBLE
+            viewModel.getRecommendations(finalSeeds, getFinalAttributes())
         }
+
+        viewModel.playlist.observe(this, Observer {
+            attributesNextButton.visibility = View.VISIBLE
+            loadingRecommendations.visibility = View.GONE
+            if (it != null) {
+                val intent = Intent(this, PlaylistActivity::class.java)
+                intent.putExtra("playlist", viewModel.playlist.value as Playlist)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Couldn't find songs for this attributes - please change them.", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun getFinalAttributes() : Attributes {
@@ -55,6 +72,16 @@ class TrackAttributesActivity : AppCompatActivity() {
         if (valenceExpand.rotation == -180F)
             attributes.valence = viewModel.attr.value?.valence
         return attributes
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun lockRotation() {
+        val currentOrientation = this.resources.configuration.orientation
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
     }
 
     private fun setObservers() {
