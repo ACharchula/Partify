@@ -11,6 +11,7 @@ import com.google.android.gms.nearby.connection.*
 import pl.antonic.partify.service.common.NearbyClientService
 import pl.antonic.partify.R
 import pl.antonic.partify.service.common.UserService
+import pl.antonic.partify.ui.common.menu.MenuActivity
 import pl.antonic.partify.ui.user.selection.UserSeedSelectionActivity
 
 class DiscoverActivity : AppCompatActivity() {
@@ -21,18 +22,18 @@ class DiscoverActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_discover)
 
-        NearbyClientService.set(Nearby.getConnectionsClient(this))
-
         viewModel = ViewModelProvider(this).get(DiscoverViewModel::class.java)
 
-        if (!viewModel.isDiscovering)
+        if (!viewModel.isDiscovering) {
+            NearbyClientService.set(Nearby.getConnectionsClient(this))
             startDiscovering()
+        }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        NearbyClientService.get().stopDiscovery()
+        NearbyClientService.stopDiscoveringAndEraseConnectionsClient()
         viewModel.isDiscovering = false
+        super.onBackPressed()
     }
 
     private fun startDiscovering() {
@@ -47,9 +48,8 @@ class DiscoverActivity : AppCompatActivity() {
             override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
                 when (result.status.statusCode) {
                     ConnectionsStatusCodes.STATUS_OK -> {
-                        NearbyClientService.get().stopDiscovery()
+                        NearbyClientService.addEndpoint(endpointId)
                         val intent = Intent(this@DiscoverActivity, UserSeedSelectionActivity::class.java)
-                        intent.putExtra("endpointId", endpointId)
                         startActivity(intent)
                     }
                     else -> Toast.makeText(this@DiscoverActivity, "Couldn't connect to host", Toast.LENGTH_SHORT).show()
@@ -58,8 +58,11 @@ class DiscoverActivity : AppCompatActivity() {
 
             override fun onDisconnected(endpointId: String) {
                 Toast.makeText(this@DiscoverActivity, "Host disconnected - please try again", Toast.LENGTH_SHORT).show()
-                NearbyClientService.get().stopDiscovery()
-                onBackPressed()
+                NearbyClientService.stopDiscoveringAndEraseConnectionsClient()
+                viewModel.isDiscovering = false
+                val intent = Intent(this@DiscoverActivity, MenuActivity::class.java)
+                finishAffinity()
+                startActivity(intent)
             }
 
             override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {

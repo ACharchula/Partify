@@ -109,8 +109,7 @@ class MainActivity : AppCompatActivity() {
                     TokenService.save(response.accessToken)
                     goToMenu()
                 }
-                AuthorizationResponse.Type.ERROR -> Toast.makeText(this, "Authorization error", Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(this, "Unknown error occurred!", Toast.LENGTH_SHORT).show()
+                else -> Toast.makeText(this, "Couldn't log in. Please try again!", Toast.LENGTH_SHORT).show()
             }
         }
     }

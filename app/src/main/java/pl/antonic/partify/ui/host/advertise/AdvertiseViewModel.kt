@@ -19,6 +19,7 @@ class AdvertiseViewModel : ViewModel() {
 
     fun addUserSelections(userSelections: UserSelections) {
         _allSeeds.value!!.add(userSelections)
+        _allSeeds.value = _allSeeds.value
     }
 
     fun getCombinedSeeds() : Seeds {
@@ -37,6 +38,7 @@ class AdvertiseViewModel : ViewModel() {
             for (user in allSeeds.value!!) {
                 if (user.userId == userId) {
                     user.seeds = seeds
+                    _allSeeds.value = _allSeeds.value
                     break
                 }
             }

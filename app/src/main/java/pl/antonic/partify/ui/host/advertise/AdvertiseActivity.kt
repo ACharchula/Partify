@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.nearby.Nearby
@@ -32,12 +33,12 @@ class AdvertiseActivity : AppCompatActivity() {
 
         connectionsClient = Nearby.getConnectionsClient(this)
 
-//        viewModel.allSeeds.observe(this, Observer {
-//            userRecycleViewAdapter.apply {
-//                dataSource = it
-//                notifyDataSetChanged()
-//            }
-//        }) //???
+        viewModel.allSeeds.observe(this, Observer {
+            userRecycleViewAdapter.apply {
+                dataSource = it
+                notifyDataSetChanged()
+            }
+        })
 
         usersRecycleView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -51,19 +52,22 @@ class AdvertiseActivity : AppCompatActivity() {
             advertiseLoading.visibility = View.GONE
 
         advertiseNextButton.setOnClickListener {
-            connectionsClient.stopAdvertising() //stop all endpoints?
-
+            stopAdvertising()
             val intent = Intent(this, HostSeedSelectionActivity::class.java)
             intent.putExtra("all_seeds", viewModel.getCombinedSeeds())
             startActivity(intent)
-
         }
     }
 
     override fun onBackPressed() {
+        stopAdvertising()
         super.onBackPressed()
+    }
+
+    private fun stopAdvertising() {
         connectionsClient.stopAllEndpoints()
         connectionsClient.stopAdvertising()
+        viewModel.isAdvertising = false
     }
 
     private fun startAdvertising() {
@@ -96,7 +100,6 @@ class AdvertiseActivity : AppCompatActivity() {
             }
 
             override fun onDisconnected(endpointId: String) {
-                Toast.makeText(this@AdvertiseActivity, "User disconnected", Toast.LENGTH_SHORT).show()
                 if (viewModel.removeIfNotCompleted(endpointId))
                     userRecycleViewAdapter.notifyDataSetChanged()
             }

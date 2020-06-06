@@ -13,10 +13,10 @@ class UserLastActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_final)
-        NearbyClientService.get().stopAllEndpoints();
+        NearbyClientService.stopDiscoveringAndEraseConnectionsClient()
         goToMenuButton.setOnClickListener {
             val intent = Intent(this, MenuActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            finishAffinity()
             startActivity(intent)
         }
     }
