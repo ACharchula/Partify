@@ -20,6 +20,7 @@ import pl.antonic.partify.model.common.Seeds
 import pl.antonic.partify.model.spotify.Playlist
 import pl.antonic.partify.ui.host.playlist.PlaylistActivity
 
+// I know that it is the ugliest code you've ever seen
 class TrackAttributesActivity : AppCompatActivity() {
 
     private lateinit var finalSeeds : Seeds

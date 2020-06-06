@@ -4,8 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import pl.antonic.partify.service.common.NearbyClientService
@@ -23,8 +23,7 @@ class DiscoverActivity : AppCompatActivity() {
 
         NearbyClientService.set(Nearby.getConnectionsClient(this))
 
-        val vm: DiscoverViewModel by viewModels() //TODO change this
-        viewModel = vm
+        viewModel = ViewModelProvider(this).get(DiscoverViewModel::class.java)
 
         if (!viewModel.isDiscovering)
             startDiscovering()

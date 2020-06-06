@@ -1,18 +1,12 @@
 package pl.antonic.partify.ui.host.advertise
 
-import android.Manifest
-import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.annotation.CallSuper
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
@@ -33,8 +27,7 @@ class AdvertiseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_advertise)
 
-        val vm: AdvertiseViewModel by viewModels()
-        viewModel = vm
+        viewModel = ViewModelProvider(this).get(AdvertiseViewModel::class.java)
         userRecycleViewAdapter = UserRecycleViewAdapter(viewModel.allSeeds.value!!)
 
         connectionsClient = Nearby.getConnectionsClient(this)

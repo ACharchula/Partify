@@ -17,7 +17,7 @@ import pl.antonic.partify.ui.common.main.MainActivity
 
 class MenuActivity : AppCompatActivity() {
 
-    //TODO Market query ?!
+    //TODO Market query?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

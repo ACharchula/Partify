@@ -56,14 +56,14 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
 
         viewModel.setIfNull(playlist)
 
-        tracksRecycleViewAdapter = if (viewModel.tracks.value != null)
-            PlaylistTracksRecycleViewAdapter(viewModel.tracks.value!!)
+        tracksRecycleViewAdapter = if (viewModel.playlist.value != null)
+            PlaylistTracksRecycleViewAdapter(viewModel.playlist.value!!.tracks!!)
         else
             PlaylistTracksRecycleViewAdapter(ObjectList(null))
 
-        viewModel.tracks.observe(this, Observer {
+        viewModel.playlist.observe(this, Observer {
             tracksRecycleViewAdapter.apply {
-                dataSource = it
+                dataSource = it.tracks!!
                 notifyDataSetChanged()
             }
         })
@@ -100,14 +100,6 @@ class PlaylistActivity : AppCompatActivity(), PlaylistTrackSelector{
             layoutManager = LinearLayoutManager(context)
             adapter = tracksRecycleViewAdapter
         }
-
-//        viewModel.playlist.observe(this, Observer {
-//            if (!viewModel.hasPlaylistStarted) {
-//                mSpotifyAppRemote!!.playerApi.play(viewModel.playlist.value!!.uri)
-//                buttonLayout.visibility = View.VISIBLE
-//                viewModel.hasPlaylistStarted = true
-//            }
-//        })
 
         nextButton.setOnClickListener {
             next()
