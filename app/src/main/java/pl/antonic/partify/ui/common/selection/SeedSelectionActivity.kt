@@ -39,8 +39,16 @@ abstract class SeedSelectionActivity : AppCompatActivity(),
         viewModel = ViewModelProvider(this).get(SeedSelectionViewModel::class.java)
 
         seedSelectionNextButton.setOnClickListener {
-            nextButtonOnClick()
+            if (selectedAtLeastOne()) {
+                nextButtonOnClick()
+            } else {
+                Toast.makeText(this, "Please select at least one seed!", Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    private fun selectedAtLeastOne() : Boolean {
+        return getSeeds().currentSize() != 0
     }
 
     override fun addId(id: String, type: SeedType) : Boolean {

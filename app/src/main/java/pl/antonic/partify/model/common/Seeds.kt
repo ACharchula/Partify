@@ -31,7 +31,7 @@ class Seeds : Serializable {
         }
     }
 
-    public fun combineSeeds(seeds: Seeds) : Seeds {
+    fun combineSeeds(seeds: Seeds) : Seeds {
         val combined = Seeds()
 
         combined.artistsIds.addAll(artistsIds)
@@ -50,7 +50,11 @@ class Seeds : Serializable {
         return artistsIds.size + tracksIds.size + genresIds.size >= MAX_AMOUNT
     }
 
-    public fun getList(type: SeedType) : List<String> {
+    fun currentSize() : Int {
+        return artistsIds.size + tracksIds.size + genresIds.size
+    }
+
+    fun getList(type: SeedType) : List<String> {
         return when (type) {
             SeedType.ARTIST -> artistsIds.toList()
             SeedType.TRACK -> tracksIds.toList()

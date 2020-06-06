@@ -12,7 +12,7 @@ class TrackAttributesViewModel : ViewModel() {
     private val repository = SpotifyService()
 
     private val _attr = MutableLiveData<Attributes>().apply {
-        value = Attributes("1", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0") }
+        value = Attributes("1", "0.0", "0.0", "0.0", "0.0", "0", "0.0") }
     val attr: LiveData<Attributes>
         get() = _attr
 
@@ -55,8 +55,7 @@ class TrackAttributesViewModel : ViewModel() {
     }
 
     fun changePopularity(text: String) {
-        val value = text.toFloat()
-        _attr.value!!.popularity = (value/100).toString()
+        _attr.value!!.popularity = text
         notifyObserver()
     }
 
