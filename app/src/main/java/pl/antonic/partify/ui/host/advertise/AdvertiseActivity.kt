@@ -79,7 +79,7 @@ class AdvertiseActivity : AppCompatActivity() {
             }
 
             override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
-                if (update.status == PayloadTransferUpdate.Status.SUCCESS ) { //&& seedsNotNull(endpointId)) { TODO
+                if (update.status == PayloadTransferUpdate.Status.SUCCESS ) {
                     userRecycleViewAdapter.notifyDataSetChanged()
                 }
             }
@@ -127,15 +127,4 @@ class AdvertiseActivity : AppCompatActivity() {
                 viewModel.isAdvertising = true
             }
     }
-
-
-
-//    private fun seedsNotNull(endpointId: String) : Boolean {
-//        for (s in allSeeds) {
-//            if (s.userName == endpointNames[endpointId]) {
-//                return s.seeds != null
-//            }
-//        }
-//        return false
-//    }
 }

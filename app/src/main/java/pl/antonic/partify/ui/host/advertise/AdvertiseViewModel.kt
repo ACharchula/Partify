@@ -42,7 +42,7 @@ class AdvertiseViewModel : ViewModel() {
                     break
                 }
             }
-        }//TODO what if there is no such endpoint id?
+        }
     }
 
     fun remove(userId: String) {

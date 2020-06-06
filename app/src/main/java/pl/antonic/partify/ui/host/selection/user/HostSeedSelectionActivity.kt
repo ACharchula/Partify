@@ -18,4 +18,6 @@ class HostSeedSelectionActivity : UserSeedSelectionActivity() {
         intent.putExtra("all_seeds", allSeeds.combineSeeds(getSeeds()))
         startActivity(intent)
     }
+
+    override fun onBackPressed() {}
 }

@@ -27,4 +27,6 @@ open class UserSeedSelectionActivity : SeedSelectionActivity() {
     override fun setGenreData() {
         viewModel.getGenres()
     }
+
+    override fun onBackPressed() {}
 }
