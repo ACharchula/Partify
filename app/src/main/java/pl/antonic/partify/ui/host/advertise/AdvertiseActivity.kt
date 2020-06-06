@@ -95,6 +95,7 @@ class AdvertiseActivity : AppCompatActivity() {
                     else -> {
                         Toast.makeText(this@AdvertiseActivity, "Connection rejected", Toast.LENGTH_SHORT).show()
                         viewModel.remove(endpointId)
+                        userRecycleViewAdapter.notifyDataSetChanged()
                     }
                 }
             }

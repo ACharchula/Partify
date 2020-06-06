@@ -20,7 +20,8 @@ class NearbyClientService {
         }
 
         fun stopDiscoveringAndEraseConnectionsClient() {
-            connectionsClient?.disconnectFromEndpoint(endpointId!!)
+            if (endpointId != null)
+                connectionsClient?.disconnectFromEndpoint(endpointId!!)
             connectionsClient?.stopDiscovery()
             connectionsClient = null
         }

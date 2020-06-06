@@ -47,6 +47,7 @@ class AdvertiseViewModel : ViewModel() {
 
     fun remove(userId: String) {
         allSeeds.value!!.removeIf { user -> user.userId == userId}
+        _allSeeds.value = _allSeeds.value
     }
 
     fun removeIfNotCompleted(userId: String) : Boolean {
