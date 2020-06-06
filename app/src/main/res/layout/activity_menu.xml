@@ -37,7 +37,7 @@
         android:id="@+id/joinPartyButton"
         android:layout_width="115dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/join_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,8 +47,18 @@
         android:id="@+id/logoutButton"
         android:layout_width="115dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/logout_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/singleRecommendationButton" />
+
+    <Button
+        android:id="@+id/singleRecommendationButton"
+        android:layout_width="115dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="single mode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/joinPartyButton" />

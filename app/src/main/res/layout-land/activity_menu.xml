@@ -58,9 +58,18 @@
         android:layout_width="115dp"
         android:layout_height="wrap_content"
         android:text="@string/join_button"
-        app:layout_constraintBottom_toTopOf="@+id/guidelineHor"
+        app:layout_constraintBottom_toTopOf="@+id/singleRecommendationButton"
         app:layout_constraintEnd_toStartOf="@+id/guidelineVer2"
         app:layout_constraintStart_toStartOf="@+id/guideline" />
+
+    <Button
+        android:id="@+id/singleRecommendationButton"
+        android:layout_width="115dp"
+        android:layout_height="wrap_content"
+        android:text="single mode"
+        app:layout_constraintBottom_toTopOf="@+id/guidelineHor"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineVer2"
+        app:layout_constraintStart_toStartOf="@+id/guideline"  />
 
     <Button
         android:id="@+id/logoutButton"

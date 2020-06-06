@@ -11,9 +11,9 @@ import kotlinx.android.synthetic.main.activity_menu.*
 import pl.antonic.partify.ui.user.discover.DiscoverActivity
 import pl.antonic.partify.R
 import pl.antonic.partify.ui.host.advertise.AdvertiseActivity
-import pl.antonic.partify.service.common.TokenService
 import pl.antonic.partify.service.common.UserService
 import pl.antonic.partify.ui.common.main.MainActivity
+import pl.antonic.partify.ui.single.SingleUserRecommendationSelectionActivity
 
 class MenuActivity : AppCompatActivity() {
 
@@ -38,6 +38,11 @@ class MenuActivity : AppCompatActivity() {
             AuthorizationClient.clearCookies(this)
             val intent = Intent(this, MainActivity::class.java)
             finishAffinity()
+            startActivity(intent)
+        }
+
+        singleRecommendationButton.setOnClickListener {
+            val intent = Intent(this, SingleUserRecommendationSelectionActivity::class.java)
             startActivity(intent)
         }
     }
