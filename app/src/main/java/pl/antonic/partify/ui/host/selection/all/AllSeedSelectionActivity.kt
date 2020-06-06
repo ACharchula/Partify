@@ -10,8 +10,6 @@ class AllSeedSelectionActivity : SeedSelectionActivity() {
 
     private lateinit var allSeeds : Seeds
 
-    //TODO add specifing at least one seed
-
     override fun getExtraData() {
         allSeeds = intent.getSerializableExtra("all_seeds") as Seeds
     }
