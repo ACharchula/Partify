@@ -183,8 +183,11 @@ class SpotifyService {
                     return
                 }
                 val recommendations = response.body()!!
-
                 val tracks = recommendations.tracks!!
+                if (tracks.isEmpty()) {
+                    _playlist.value = _playlist.value
+                    return
+                }
                 createPlaylistAndAddTracks(tracks, _playlist)
             }
         })
@@ -198,8 +201,6 @@ class SpotifyService {
         for (track in tracks) {
             tracksURIs.add(track.uri!!)
         }
-
-        val tracksString = tracksURIs.joinToString(",")
 
         val apiService = getApiService()
 
@@ -215,7 +216,7 @@ class SpotifyService {
 
             override fun onResponse(call: Call<Playlist>, response: Response<Playlist>) {
                 val playlist = response.body()!!
-                val thirdCallback = apiService.addTracksToPlaylist(playlist.id!!, tracksString)
+                val thirdCallback = apiService.addTracksToPlaylist(playlist.id!!, TracksToAdd(tracksURIs))
                 thirdCallback.enqueue(object : Callback<Void> {
                     override fun onFailure(call: Call<Void>, t: Throwable) {
                         Log.e("Fetch error", t.message!!)

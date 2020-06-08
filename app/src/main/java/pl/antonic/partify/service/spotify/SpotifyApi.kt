@@ -43,8 +43,7 @@ interface SpotifyApi {
     ) : Call<Playlist>
 
     @POST("playlists/{playlist_id}/tracks")
-    fun addTracksToPlaylist(@Path("playlist_id") playlistId: String,
-                            @Query("uris") tracks: String) : Call<Void>
+    fun addTracksToPlaylist(@Path("playlist_id") playlistId: String, @Body uris: TracksToAdd) : Call<Void>
 
 
     //In spotify deleting playlist is impossible - user has a feeling of deleting it, but in
