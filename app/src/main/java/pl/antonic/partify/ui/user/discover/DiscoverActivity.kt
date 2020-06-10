@@ -37,7 +37,7 @@ class DiscoverActivity : AppCompatActivity() {
     }
 
     private fun startDiscovering() {
-        val discoveryOptions = DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
+        val discoveryOptions = DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
 
         val payloadCallback = object : PayloadCallback() {
             override fun onPayloadReceived(endpointId: String, payload: Payload) {}

@@ -12,7 +12,7 @@ import pl.antonic.partify.model.common.SeedType
 import pl.antonic.partify.model.common.SelectableGenres
 import pl.antonic.partify.ui.common.selection.SeedListModificator
 
-class GenreRecycleViewAdapter(private val dataSource: SelectableGenres)
+class GenreRecycleViewAdapter(var dataSource: SelectableGenres)
     : RecyclerView.Adapter<GenreRecycleViewAdapter.ViewHolder>() {
 
     class ViewHolder(genreRow: View) : RecyclerView.ViewHolder(genreRow) {

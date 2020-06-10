@@ -71,7 +71,7 @@ class AdvertiseActivity : AppCompatActivity() {
     }
 
     private fun startAdvertising() {
-        val advertisingOptions = AdvertisingOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
+        val advertisingOptions = AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
 
         val payloadCallback = object : PayloadCallback() {
             override fun onPayloadReceived(endpointId: String, payload: Payload) {

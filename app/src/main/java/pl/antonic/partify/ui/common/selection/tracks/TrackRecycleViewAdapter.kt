@@ -15,7 +15,7 @@ import pl.antonic.partify.ui.common.selection.SeedListModificator
 import pl.antonic.partify.model.spotify.ObjectList
 import pl.antonic.partify.model.spotify.Track
 
-class TrackRecycleViewAdapter(private val dataSource: ObjectList<Track>)
+class TrackRecycleViewAdapter(var dataSource: ObjectList<Track>)
     : RecyclerView.Adapter<TrackRecycleViewAdapter.ViewHolder>() {
 
     class ViewHolder(trackRow: View) : RecyclerView.ViewHolder(trackRow) {
